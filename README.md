@@ -12,13 +12,13 @@ Medication adherence is a significant challenge in the realm of healthcare. Non-
 - ui wireframe
 
 ## Workflow
-![workflow](./documents/workflow.png)
+![workflow](./assets/workflow.png)
 
 ## Hardware Design
-![hardware](./documents/hardware.png)
+![hardware](./assets/hardware.png)
 
 ## Software Design
-![software](./documents/software.png)
+![software](./assets/software.png)
 
 ## UI wireframe
-![wireframe](./documents/wireframe.png)
+![wireframe](./assets/wireframe.png)
