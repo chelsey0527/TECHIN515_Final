@@ -1,15 +1,16 @@
-import { getIntakeScheduleForUser } from '../services/intakeScheduleService.js';
+import IntakeSchedule from '../models/intakeSchedule.js';
 
 export const fetchIntakeSchedules = async (req, res) => {
-    const userId = 1; // ** Preset using Admin user for demo
-    const userName = 'admin';
-
     try {
-        const schedules = await getIntakeScheduleForUser(userId);
-        res.json({
-            user: { id: userId, username: userName },
-            intakeSchedules: schedules
+        const schedules = await IntakeSchedule.findAll({
+            where: {
+                userId: 1, // admin user ID
+                scheduledTime: {
+                    [Sequelize.Op.eq]: new Date(), // filters for today’s schedules
+                }
+            }
         });
+        res.json(schedules);
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal Server Error');
