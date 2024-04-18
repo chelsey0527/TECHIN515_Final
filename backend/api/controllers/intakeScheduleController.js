@@ -1,16 +1,25 @@
-import IntakeSchedule from '../models/intakeSchedule.js';
+// import { getIntakeScheduleForUser } from '../services/intakeScheduleService.js';
+
+// export const fetchIntakeSchedules = async (req, res) => {
+//     try {
+//         const userId = 1;  // Example: Get from request or use a default
+//         const schedules = await getIntakeScheduleForUser(user_id);
+//         res.json({ userId, schedules });
+//         console.log(res);
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).send('Internal Server Error');
+//     }
+// };
+
+import { getIntakeScheduleForUser } from '../services/intakeScheduleService.js';
 
 export const fetchIntakeSchedules = async (req, res) => {
     try {
-        const schedules = await IntakeSchedule.findAll({
-            where: {
-                userId: 1, // admin user ID
-                scheduledTime: {
-                    [Sequelize.Op.eq]: new Date(), // filters for today’s schedules
-                }
-            }
-        });
-        res.json(schedules);
+        const user_id = 1;  // Example: Get from request or use a default
+        const schedules = await getIntakeScheduleForUser(user_id);
+        res.json({ user_id, schedules });
+        console.log(res)
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal Server Error');
