@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 
 const homeClient = new PrismaClient();
 
-// getHomeData: Fetches all relevant data for the home page
+// getHomeData: Fetches all relevant data for home page
 export const getHomeData = async (req, res) => {
     try {
         const userId = req.params.id;
