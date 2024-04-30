@@ -11,7 +11,7 @@ app.use(express.json());
 
 app.use('/users', userRouter);
 app.use('/home', homeRouter);
-app.use('/pillcase', pillcaseRouter);
+app.use('/pillcases', pillcaseRouter);
 
 app.listen(port, () => {
     console.log(`server running on ${port}`);

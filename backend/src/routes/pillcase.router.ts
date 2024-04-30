@@ -1,9 +1,11 @@
 import { Router } from 'express';
-import { getPillcaseById, updatePillcaseById } from '../controllers/pillcase.controller';
+import { getAllPillcase, getPillcaseById, createPillcase, updatePillcase } from '../controllers/pillcase.controller';
 
 const pillcaseRouter = Router();
 
+pillcaseRouter.get('/', getAllPillcase);
 pillcaseRouter.get('/:pillcaseId', getPillcaseById);
-pillcaseRouter.put('/:pillcaseId', updatePillcaseById);
+pillcaseRouter.post('/', createPillcase);
+pillcaseRouter.put('/:pillcaseId', updatePillcase);
 
 export default pillcaseRouter;

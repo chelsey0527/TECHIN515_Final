@@ -3,6 +3,6 @@ import { getHomeData } from '../controllers/home.controller';
 
 const homeRouter = Router();
 
-homeRouter.get('/', getHomeData);
+homeRouter.get('/:id', getHomeData);
 
 export default homeRouter;
