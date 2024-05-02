@@ -58,7 +58,7 @@ async def send_recurring_telemetry(device_client):
 
 def main():
     # Copy and paste your "Primary connection string" below.
-    conn_str = "HostName=cloudlab-smartpill.azure-devices.net;DeviceId=iotdevice;SharedAccessKey=7jMWrSQl3PNUZdSggHu5V2qIhil+9rAnmAIoTMN/o8o="
+    conn_str = "primary_connection_string_here"
     # The client object is used to interact with your Azure IoT hub.
     device_client = IoTHubDeviceClient.create_from_connection_string(conn_str)
 
