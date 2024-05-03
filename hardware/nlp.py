@@ -96,7 +96,8 @@ def get_response(user_input):
 
 # Function to check if the intake completion button is pressed
 def check_button_status():
-    return lgpio.gpio_read(h, BUTTON_GPIO_PIN)
+    button_status = lgpio.gpio_read(h, BUTTON_GPIO_PIN)
+    return button_status
 
 # Function to turn on the lights based on scheduled time
 def turn_on_lights(scheduled_time):
@@ -106,15 +107,16 @@ def turn_on_lights(scheduled_time):
     if scheduled_time == current_time:
         for pin in RELAY_GPIO_PINS:
             lgpio.gpio_write(h, pin, 1)
-        print("Lights turned ON")
-    else:
+        print(f"Time to take your medicine from case {caseNo}")
+    elif scheduled_time != current_time or button_status == 1:
         turn_off_lights()  # Turn off the lights if scheduled time != now
 
 # Function to turn off the lights
 def turn_off_lights():
     for pin in RELAY_GPIO_PINS:
         lgpio.gpio_write(h, pin, 0)
-    print("Lights turned OFF")
+        button_status = 0
+    # print("Lights turned OFF")
 
 # Main loop
 while listening:
