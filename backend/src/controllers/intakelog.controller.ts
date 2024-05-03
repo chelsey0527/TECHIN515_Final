@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
+import { scheduler } from "timers/promises";
 
 const prisma = new PrismaClient();
 
@@ -20,6 +21,7 @@ export const getIntakelogData = async (req: Request, res: Response): Promise<voi
                     select: {
                         intakeTime: true,
                         isIntaked: true,
+                        date: true, // scheduleTimes
                     }
                 }
             }
@@ -31,6 +33,7 @@ export const getIntakelogData = async (req: Request, res: Response): Promise<voi
             pillName: pillcase.pillName,
             caseNo: pillcase.caseNo,
             doses: pillcase.doses,
+            date: log.date,
             intakeTime: log.intakeTime,
             isIntaked: log.isIntaked,
         })));
@@ -66,9 +69,9 @@ export const scheduleDailyIntakeLogs = async (user_id) => {
             pillcase.scheduleTimes.map(scheduleTime => ({
                 pillcaseId: pillcase.id,
                 userId: userId,
-                intakeTime: null, // You can set this to null initially or to the scheduleTime if required
+                intakeTime: null, // set into null
                 isIntaked: false,
-                date: new Date(scheduleTime) // Converts the scheduleTime to a Date object
+                date: scheduleTime // Converts the scheduleTime to a Date object
             }))
         );
 

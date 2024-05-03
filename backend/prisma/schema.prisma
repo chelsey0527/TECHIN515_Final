@@ -30,7 +30,7 @@ model Pillcase {
   doses         Int         @default(1)
   user          User?       @relation(fields: [userId], references: [id])
   userId        String?
-  scheduleTimes DateTime[] // This could be an array of fixed schedule times for medication
+  scheduleTimes String[]
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
   IntakeLog     IntakeLog[]
@@ -44,7 +44,7 @@ model IntakeLog {
   pillcase   Pillcase  @relation(fields: [pillcaseId], references: [id])
   intakeTime DateTime? // The actual time the medication was taken
   isIntaked  Boolean   @default(false) // Whether the dose was taken
-  date       DateTime // The date of the intake
+  date       String // The date of the intake
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
 }
