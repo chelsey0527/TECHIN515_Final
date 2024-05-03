@@ -3,7 +3,11 @@ import lgpio
 import speech_recognition as sr
 import pyttsx3
 import openai
+import sqlite3
 from datetime import datetime, timedelta
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Initialize pyttsx3
 listening = True
@@ -37,28 +41,32 @@ def fetch_medication_data():
     try:
         # Connect to your Azure PostgreSQL database
         conn = psycopg2.connect(
-            dbname="your_database_name",
-            user="your_username",
-            password="your_password",
-            host="your_host",
-            port="your_port"
+            dbname="DATABASE",
+            user="USER",
+            password="PASSWORD",
+            host="HOST",
+            port="PORT"
         )
-
+        
         # Create a cursor object
         cursor = conn.cursor()
 
-        # Execute a query to fetch medication intake data (replace with your query)
-        cursor.execute("SELECT scheduled_time, actual_time FROM medication_intake ORDER BY actual_time DESC LIMIT 1")
+        # Execute a query to fetch all tables in the current schema
+        cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_type='BASE TABLE'")
 
-        # Fetch the result
-        result = cursor.fetchone()
+        # Fetch the table name
+        table_name = cursor.fetchone()[0]
 
+        # Execute a query to fetch all columns from the first table in the schema
+        cursor.execute(f"SELECT * FROM {table_name}")
+        
+        # Fetch all the results
+        result = cursor.fetchall()
+        
         return result
-
     except (Exception, psycopg2.Error) as error:
         print("Error fetching data from PostgreSQL:", error)
         return None
-
     finally:
         # Close the database connection
         if conn:
