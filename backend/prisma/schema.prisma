@@ -13,19 +13,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// model Author {
-//   id    String @id @default(uuid())
-//   name  String
-//   books Book[]
-// }
-
-// model Book {
-//   id       String @id @default(uuid())
-//   author   Author @relation(fields: [authorId], references: [id])
-//   authorId String
-//   title    String
-// }
-
 model User {
   id              String     @id @default(uuid())
   name            String
@@ -47,15 +34,17 @@ model Pillcase {
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
   IntakeLog     IntakeLog[]
+  caseNo        Int
 }
 
 model IntakeLog {
-  id         String   @id @default(uuid())
+  id         String    @id @default(uuid())
   pillcaseId String
-  pillcase   Pillcase @relation(fields: [pillcaseId], references: [id])
-  intakeTime DateTime // The actual time the medication was taken
-  isIntaked  Boolean  @default(false) // Whether the dose was taken
+  userId     String
+  pillcase   Pillcase  @relation(fields: [pillcaseId], references: [id])
+  intakeTime DateTime? // The actual time the medication was taken
+  isIntaked  Boolean   @default(false) // Whether the dose was taken
   date       DateTime // The date of the intake
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 }
