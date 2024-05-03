@@ -6,10 +6,13 @@ Medication adherence is a significant challenge in the realm of healthcare. Non-
 **Therefore, with this project, we aim to develop a smart pill dispenser to help individuals in effectively managing and adhering to their medications and supplements.**
 
 ## Table of Contents  
+- UI
 - workflow
 - hardware design
 - software design
-- ui wireframe
+
+## UI 
+![wireframe](./assets/ui.png)
 
 ## Workflow
 ![workflow](./assets/workflow.png)
@@ -20,5 +23,4 @@ Medication adherence is a significant challenge in the realm of healthcare. Non-
 ## Software Design
 ![software](./assets/software.png)
 
-## UI wireframe
-![wireframe](./assets/wireframe.png)
+
