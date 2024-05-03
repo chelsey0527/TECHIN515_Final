@@ -6,6 +6,7 @@ import homeRouter from './routes/home.router';
 import pillcaseRouter from './routes/pillcase.router';
 import locationRouter from './routes/location.router';
 import intakelogRouter from './routes/intakelog.router';
+import deviceRouter from './routes/device.router';
 import { scheduleDailyIntakeLogs } from './controllers/intakelog.controller';
 
 const app = express();
@@ -18,6 +19,7 @@ app.use('/home', homeRouter);
 app.use('/pillcases', pillcaseRouter);
 app.use('/intakelog', intakelogRouter);
 app.use('/location', locationRouter);
+app.use('/device', deviceRouter);
 
 
 // Setting up the cron job to run at midnight every day
