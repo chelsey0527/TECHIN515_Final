@@ -56,10 +56,11 @@ export const createPillcase = async (req: Request, res: Response): Promise<void>
 };
 
 // updatePillcase
-export const updatePillcase = async (req: Request, res: Response): Promise<void> => {
+export const updatePillcaseById = async (req: Request, res: Response): Promise<void> => {
     try {
         const pillcaseId = req.params.pillcaseId;
         const pillcaseData = req.body;
+        // ** when updating the scheduleTimes, we should fetch all records and send them back
         const pillcase = await prisma.pillcase.update({
             where: {
                 id: pillcaseId,

@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "IntakeLog" ALTER COLUMN "date" SET DATA TYPE TEXT;

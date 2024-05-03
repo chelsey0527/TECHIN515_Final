@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import { getLocationData } from '../controllers/location.controller';
 
-const homeRouter = Router();
+const locationRouter = Router();
 
-homeRouter.get('/:id', getLocationData);
+locationRouter.get('/:id', getLocationData);
 
-export default homeRouter;
+export default locationRouter;
