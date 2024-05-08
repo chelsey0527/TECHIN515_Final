@@ -1,5 +1,6 @@
 .DS_Store
 .env
+.conda
 node_modules
 __pycache__
 venv
