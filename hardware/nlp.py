@@ -1,13 +1,20 @@
+import os
 import psycopg2
 import lgpio
 import speech_recognition as sr
 import pyttsx3
 import openai
-import sqlite3
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 
 load_dotenv()
+
+# Database connection information
+dbname = os.getenv("DATABASE")
+user = os.getenv("USER")
+password = os.getenv("PASSWORD")
+host = os.getenv("HOST")
+port = os.getenv("PORT")
 
 # Initialize pyttsx3
 listening = True
@@ -23,7 +30,7 @@ rate = engine.getProperty('rate')
 volume = engine.getProperty('volume')
 
 # Define the GPIO pin numbers
-RELAY_GPIO_PINS = [17, 22, 5]  # GPIO pins for three lights
+RELAY_GPIO_PINS = [17]  # GPIO pins for light
 BUTTON_GPIO_PIN = 23  # GPIO pin for the intake completion button
 
 # Initialize the GPIO
@@ -41,18 +48,18 @@ def fetch_medication_data():
     try:
         # Connect to your Azure PostgreSQL database
         conn = psycopg2.connect(
-            dbname="DATABASE",
-            user="USER",
-            password="PASSWORD",
-            host="HOST",
-            port="PORT"
+        dbname=dbname,
+        user=user,
+        password=password,
+        host=host,
+        port=port
         )
         
         # Create a cursor object
         cursor = conn.cursor()
 
         # Execute a query to fetch all tables in the current schema
-        cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_schema='public' AND table_type='BASE TABLE'")
+        cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_schema='public'")
 
         # Fetch the table name
         table_name = cursor.fetchone()[0]
@@ -94,11 +101,16 @@ def generate_medication_response():
 # Function to get response from OpenAI ChatGPT
 def get_response(user_input):
     messages.append({"role": "user", "content": user_input})
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=messages
+    response = openai.Completion.create(
+        engine="text-davinci-003",
+        prompt=messages,
+        temperature=0.5,
+        max_tokens=50,
+        top_p=1.0,
+        frequency_penalty=0.0,
+        presence_penalty=0.0
     )
-    ChatGPT_reply = response["choices"][0]["message"]["content"]
+    ChatGPT_reply = response["choices"][0]["text"]
     messages.append({"role": "assistant", "content": ChatGPT_reply})
     return ChatGPT_reply
 

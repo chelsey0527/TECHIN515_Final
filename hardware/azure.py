@@ -1,80 +1,60 @@
-import asyncio
-import time
-import lgpio
-from azure.iot.device.aio import IoTHubDeviceClient
-from azure.iot.device import Message
+import os
+import psycopg2
+from dotenv import load_dotenv
+import datetime
 
-# Set GPIO pin numbers for ultrasonic sensor
-TRIG_PIN = 18
-ECHO_PIN = 24
+# Load environment variables from .env file
+load_dotenv()
 
-# Initialize the GPIO
-gpio = lgpio.gpiochip_open(4)
+# Database connection information
+dbname = os.getenv("DATABASE")
+user = os.getenv("USER")
+password = os.getenv("PASSWORD")
+host = os.getenv("HOST")
+port = os.getenv("PORT")
 
-# Set GPIO pin modes
-lgpio.gpio_claim_output(gpio, TRIG_PIN)
-lgpio.gpio_claim_input(gpio, ECHO_PIN)
+def print_table(rows, headers):
+    if rows:
+        print("\n" + "-"*80)
+        print(" | ".join(headers))
+        print("-"*80)
+        for row in rows:
+            print(" | ".join(str(col) for col in row))
+        print("-"*80)
 
-def get_distance():
-    # Send a short pulse to trigger the sensor
-    lgpio.tx_pulse(gpio, TRIG_PIN, 10, 100)
+try:
+    # Connect to the database
+    conn = psycopg2.connect(
+        dbname=dbname,
+        user=user,
+        password=password,
+        host=host,
+        port=port
+    )
 
-    # Measure the duration of the pulse from the echo pin
-    start = time.time()
-    while lgpio.gpio_read(gpio, ECHO_PIN) == 0:
-        if time.time() - start > 0.1:
-            return None
-    pulse_start_time = time.time()
+    # Create a cursor
+    cur = conn.cursor()
 
-    while lgpio.gpio_read(gpio, ECHO_PIN) == 1:
-        if time.time() - start > 0.1:
-            return None
-    pulse_end_time = time.time()
+    # Get list of tables in the database
+    cur.execute("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'")
 
-    pulse_duration = pulse_end_time - pulse_start_time
+    tables = cur.fetchall()
 
-    # Calculate distance in centimeters
-    distance = pulse_duration * 17150
-    distance = round(distance, 2)
+    # Display the first few rows of each table
+    for table in tables:
+        table_name = table[0]
+        print(f"\nTable: {table_name}")
+        cur.execute(f"SELECT * FROM {table_name}")
+        try:
+            rows = cur.fetchall()
+            headers = [i[0] for i in cur.description]
+            print_table(rows, headers)
+        except psycopg2.Error as e:
+            print("Error fetching data from table:", e)
 
-    return distance
+    # Close cursor and connection
+    cur.close()
+    conn.close()
 
-async def send_recurring_telemetry(device_client):
-    # Connect the client.
-    await device_client.connect()
-
-    # Send recurring telemetry
-    while True:
-        distance = get_distance()
-        if distance is not None:
-            # Convert distance to bytes
-            data = str(distance).encode('utf-8')
-            msg = Message(data)
-            print("Sending distance: " + str(distance))
-            await device_client.send_message(msg)
-        else:
-            print("Measurement timeout")
-        await asyncio.sleep(1)
-
-def main():
-    # Copy and paste your "Primary connection string" below.
-    conn_str = "primary_connection_string_here"
-    # The client object is used to interact with your Azure IoT hub.
-    device_client = IoTHubDeviceClient.create_from_connection_string(conn_str)
-
-    print("IoTHub Device Client Recurring Telemetry Sample")
-    print("Press Ctrl+C to exit")
-    loop = asyncio.get_event_loop()
-    try:
-        loop.run_until_complete(send_recurring_telemetry(device_client))
-    except KeyboardInterrupt:
-        print("User initiated exit")
-    except Exception:
-        print("Unexpected exception!")
-        raise
-    finally:
-        loop.run_until_complete(device_client.shutdown())
-        loop.close()
-
-if __name__ == "__main__":
-    main()
+except psycopg2.Error as e:
+    print("Error connecting to the database:", e)
