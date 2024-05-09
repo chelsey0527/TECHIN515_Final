@@ -1,0 +1,10 @@
+psycopg2-binary
+lgpio
+speech_recognition
+pyttsx3
+openai
+python-dotenv
+asyncio
+azure-iot-device
+adafruit-circuitpython-bme280
+pyodbc

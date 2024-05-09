@@ -6,6 +6,7 @@ import pyttsx3
 import openai
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
+from humidity import read_bme280_sensor
 
 load_dotenv()
 
@@ -48,27 +49,21 @@ def fetch_medication_data():
     try:
         # Connect to your Azure PostgreSQL database
         conn = psycopg2.connect(
-        dbname=dbname,
-        user=user,
-        password=password,
-        host=host,
-        port=port
+            dbname=dbname,
+            user=user,
+            password=password,
+            host=host,
+            port=port
         )
         
         # Create a cursor object
         cursor = conn.cursor()
 
-        # Execute a query to fetch all tables in the current schema
-        cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_schema='public'")
-
-        # Fetch the table name
-        table_name = cursor.fetchone()[0]
-
-        # Execute a query to fetch all columns from the first table in the schema
-        cursor.execute(f"SELECT * FROM {table_name}")
+        # Execute a query to fetch the last intake time and schedule for the user's medicine
+        cursor.execute("SELECT i.intaketime, p.scheduletimes FROM intakelog i JOIN pillcase p ON i.pillcaseid = p.id ORDER BY i.date DESC LIMIT 1")
         
-        # Fetch all the results
-        result = cursor.fetchall()
+        # Fetch the result
+        result = cursor.fetchone()
         
         return result
     except (Exception, psycopg2.Error) as error:
@@ -85,11 +80,11 @@ def generate_medication_response():
     medication_data = fetch_medication_data()
 
     if medication_data:
-        scheduled_time, actual_time = medication_data
+        last_intake_time, schedule_times = medication_data
 
-        if actual_time:
-            last_intake_time = actual_time.strftime("%Y-%m-%d %H:%M:%S")
-            next_intake_time = (actual_time + timedelta(hours=4)).strftime("%Y-%m-%d %H:%M:%S")
+        if last_intake_time:
+            last_intake_time = last_intake_time.strftime("%Y-%m-%d %H:%M:%S")
+            next_intake_time = (last_intake_time + timedelta(hours=4)).strftime("%Y-%m-%d %H:%M:%S")
 
             return f"The last time you took your medicine was at {last_intake_time}. Your next intake is due at {next_intake_time}."
         else:
@@ -138,6 +133,42 @@ def turn_off_lights():
         button_status = 0
     # print("Lights turned OFF")
 
+# Function to update the intake log when the button is pressed
+def update_intake_log():
+    try:
+        # Connect to your Azure PostgreSQL database
+        conn = psycopg2.connect(
+            dbname=dbname,
+            user=user,
+            password=password,
+            host=host,
+            port=port
+        )
+        
+        # Create a cursor object
+        cursor = conn.cursor()
+
+        # Fetch the pillcase ID of the medicine currently being taken
+        cursor.execute("SELECT id FROM pillcase WHERE caseNo = 2")  # Assuming caseNo is 2 for Tylenol
+        pillcase_id = cursor.fetchone()[0]
+
+        # Update the intake log
+        cursor.execute("UPDATE intakelog SET intaketime = NOW(), isintaked = True WHERE pillcaseid = %s", (pillcase_id,))
+        
+        # Commit the transaction
+        conn.commit()
+        
+        print("Intake log updated successfully.")
+        
+    except (Exception, psycopg2.Error) as error:
+        print("Error updating intake log in PostgreSQL:", error)
+        conn.rollback()
+    finally:
+        # Close the database connection
+        if conn:
+            cursor.close()
+            conn.close()
+
 # Main loop
 while listening:
     with sr.Microphone() as source:
@@ -169,26 +200,14 @@ while listening:
                 engine.say(medication_response)
                 engine.runAndWait()
 
-            elif "check intake completion" in response.lower():
-                button_status = check_button_status()
-                if button_status:
-                    print("Intake completed.")
-                    turn_off_lights()
-                else:
-                    print("Intake not completed. Please take your medicine")
+            elif "take my medicine" in response.lower():
+                update_intake_log()
 
-            else:
-                print("Didn't recognize any valid command.")
-
-            # Check if it's time to turn on the lights
-            medication_data = fetch_medication_data()
-            if medication_data:
-                scheduled_time, _ = medication_data
-                turn_on_lights(scheduled_time)
+        except sr.WaitTimeoutError:
+            print("No command detected.")
 
         except sr.UnknownValueError:
-            print("Didn't recognize anything.")
+            print("Could not understand the audio.")
 
-# Clean up GPIO on exit
-lgpio.gpiochip_close(h)
-print("GPIO cleanup completed")
+        except sr.RequestError as e:
+            print("Could not request results; {0}".format(e))

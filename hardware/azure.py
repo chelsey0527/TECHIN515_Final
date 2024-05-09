@@ -36,15 +36,14 @@ try:
     cur = conn.cursor()
 
     # Get list of tables in the database
-    cur.execute("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'")
-
+    cur.execute('SELECT table_name FROM information_schema.tables WHERE table_schema = \'public\'')
     tables = cur.fetchall()
 
-    # Display the first few rows of each table
+    # Display the entire Pillcase table
     for table in tables:
         table_name = table[0]
         print(f"\nTable: {table_name}")
-        cur.execute(f"SELECT * FROM {table_name}")
+        cur.execute(f'SELECT * FROM "public"."{table_name}"')
         try:
             rows = cur.fetchall()
             headers = [i[0] for i in cur.description]
