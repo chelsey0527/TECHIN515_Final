@@ -4,7 +4,7 @@ import cron from 'node-cron';
 import userRouter from './routes/user.router';
 import homeRouter from './routes/home.router';
 import pillcaseRouter from './routes/pillcase.router';
-import locationRouter from './routes/location.router';
+import locationRouter from './routes/environment.router';
 import intakelogRouter from './routes/intakelog.router';
 import deviceRouter from './routes/device.router';
 import { scheduleDailyIntakeLogs } from './controllers/intakelog.controller';

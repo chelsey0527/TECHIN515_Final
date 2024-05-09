@@ -14,8 +14,8 @@ export const getHomeData = async (req: Request, res: Response): Promise<void> =>
             select: {
                 name: true,
                 profileImageUrl: true,
-                pillboxLat: true,
-                pillboxLong: true,
+                pillboxHumidity: true,
+                pillboxTemperature: true,
                 pillcases: {
                     select: {
                         id: true,
