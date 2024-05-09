@@ -38,13 +38,13 @@ model Pillcase {
 }
 
 model IntakeLog {
-  id         String    @id @default(uuid())
-  pillcaseId String
-  userId     String
-  pillcase   Pillcase  @relation(fields: [pillcaseId], references: [id])
-  intakeTime DateTime? // The actual time the medication was taken
-  isIntaked  Boolean   @default(false) // Whether the dose was taken
-  date       String // The date of the intake
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  id           String    @id @default(uuid())
+  pillcaseId   String
+  userId       String
+  pillcase     Pillcase  @relation(fields: [pillcaseId], references: [id])
+  intakeTime   DateTime? // The actual time the medication was taken
+  isIntaked    Boolean   @default(false) // Whether the dose was taken
+  scheduleTime String? // The date of the intake
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 }

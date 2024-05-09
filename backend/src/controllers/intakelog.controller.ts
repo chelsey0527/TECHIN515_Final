@@ -21,7 +21,7 @@ export const getIntakelogData = async (req: Request, res: Response): Promise<voi
                     select: {
                         intakeTime: true,
                         isIntaked: true,
-                        date: true, // scheduleTimes
+                        scheduleTime: true, // scheduleTimes
                     }
                 }
             }
@@ -33,7 +33,7 @@ export const getIntakelogData = async (req: Request, res: Response): Promise<voi
             pillName: pillcase.pillName,
             caseNo: pillcase.caseNo,
             doses: pillcase.doses,
-            date: log.date,
+            date: log.scheduleTime,
             intakeTime: log.intakeTime,
             isIntaked: log.isIntaked,
         })));
@@ -71,7 +71,7 @@ export const scheduleDailyIntakeLogs = async (user_id) => {
                 userId: userId,
                 intakeTime: null, // set into null
                 isIntaked: false,
-                date: scheduleTime // Converts the scheduleTime to a Date object
+                scheduleTime: scheduleTime // Converts the scheduleTime to string
             }))
         );
 

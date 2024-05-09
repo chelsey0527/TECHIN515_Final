@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import IndexSection__elements3 from '../components/__elements/IndexSection__elements3';
 import IndexSection__elements15 from '../components/__elements/IndexSection__elements15';
@@ -14,6 +14,16 @@ const meta = {
 };
 
 export default function Index() {
+  const [isLoading, setIsLoading] = useState(false);
+  
+  useEffect(() => {
+    
+  }, []);
+
+  if (isLoading) {
+    return <div>Loading ...</div>;
+  }
+
   return (
     <React.Fragment>
       <HelmetProvider>
