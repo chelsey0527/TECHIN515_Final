@@ -14,14 +14,14 @@ datasource db {
 }
 
 model User {
-  id              String     @id @default(uuid())
-  name            String
-  profileImageUrl String     @default("https://media.istockphoto.com/id/1337144146/vector/default-avatar-profile-icon-vector.jpg?s=612x612&w=0&k=20&c=BIbFwuv7FxTWvh5S3vB6bkT0Qv8Vn8N5Ffseq84ClGI=")
-  pillboxLat      Float
-  pillboxLong     Float
-  pillcases       Pillcase[]
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime   @updatedAt
+  id                 String     @id @default(uuid())
+  name               String
+  profileImageUrl    String     @default("https://media.istockphoto.com/id/1337144146/vector/default-avatar-profile-icon-vector.jpg?s=612x612&w=0&k=20&c=BIbFwuv7FxTWvh5S3vB6bkT0Qv8Vn8N5Ffseq84ClGI=")
+  pillboxHumidity    Float?
+  pillboxTemperature Float?
+  pillcases          Pillcase[]
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
 }
 
 model Pillcase {
@@ -38,13 +38,13 @@ model Pillcase {
 }
 
 model IntakeLog {
-  id         String    @id @default(uuid())
-  pillcaseId String
-  userId     String
-  pillcase   Pillcase  @relation(fields: [pillcaseId], references: [id])
-  intakeTime DateTime? // The actual time the medication was taken
-  isIntaked  Boolean   @default(false) // Whether the dose was taken
-  date       String // The date of the intake
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  id           String    @id @default(uuid())
+  pillcaseId   String
+  userId       String
+  pillcase     Pillcase  @relation(fields: [pillcaseId], references: [id])
+  intakeTime   DateTime? // The actual time the medication was taken
+  isIntaked    Boolean   @default(false) // Whether the dose was taken
+  scheduleTime String? // The date of the intake
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 }

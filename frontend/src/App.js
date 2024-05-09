@@ -13,11 +13,8 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<IndexPage />} />
-         
       <Route path="/intakehistory" element={<IntakeHistoryPage />} />
-         
       <Route path="/trackdevice" element={<TrackDevicePage />} />
-         
       <Route path="/forms" element={<FormsPage />} />
     </Routes>
   );
