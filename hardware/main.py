@@ -6,13 +6,13 @@ import pyttsx3
 import openai
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
-from hardware.humidity import read_bme280_sensor
+from humidity import read_bme280_sensor, update_humidity_temperature  # Import the read_bme280_sensor function
 
 load_dotenv()
 
 # Database connection information
 dbname = os.getenv("DATABASE")
-user = os.getenv("USER")
+user = "chelsey"
 password = os.getenv("PASSWORD")
 host = os.getenv("HOST")
 port = os.getenv("PORT")
@@ -20,15 +20,6 @@ port = os.getenv("PORT")
 # Initialize pyttsx3
 listening = True
 engine = pyttsx3.init()
-
-# Set your OpenAI API key and customize the ChatGPT role
-openai.api_key = "OPENAI_API_KEY"
-messages = [{"role": "system", "content": "Your name is Tom and give answers in 2 lines. You will be provided with our database information. Only answer based on the information provided."}]
-
-# Customizing the output voice
-voices = engine.getProperty('voices')
-rate = engine.getProperty('rate')
-volume = engine.getProperty('volume')
 
 # Define the GPIO pin numbers
 RELAY_GPIO_PINS = [17]  # GPIO pins for light
@@ -85,6 +76,15 @@ def fetch_medication_data():
             cur.close()
             conn.close()
 
+# Set your OpenAI API key and customize the ChatGPT role
+openai.api_key = os.getenv("OPENAI_API_KEY")
+messages = [{"role": "system", "content": "Your name is Tom and give answers in 2 lines. You will be provided with our database information. Answer based on the information provided."}]
+
+# Customizing the output voice
+voices = engine.getProperty('voices')
+rate = engine.getProperty('rate')
+volume = engine.getProperty('volume')
+
 # Function to generate response based on medication intake data
 def generate_medication_response():
     medication_data = fetch_medication_data()
@@ -102,16 +102,11 @@ def generate_medication_response():
 # Function to get response from OpenAI ChatGPT
 def get_response(user_input):
     messages.append({"role": "user", "content": user_input})
-    response = openai.Completion.create(
-        engine="gpt-3.5-turbo-0125",
-        prompt=messages,
-        temperature=0.5,
-        max_tokens=50,
-        top_p=1.0,
-        frequency_penalty=0.0,
-        presence_penalty=0.0
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=messages
     )
-    ChatGPT_reply = response["choices"][0]["text"]
+    ChatGPT_reply = response["choices"][0]["message"]["content"]
     messages.append({"role": "assistant", "content": ChatGPT_reply})
     return ChatGPT_reply
 
@@ -159,49 +154,18 @@ def update_intake_log():
             cursor.close()
             conn.close()
 
-# Function to update humidity and temperature in the User table
-def update_humidity_temperature():
-    try:
-        # Connect to your Azure PostgreSQL database
-        conn = psycopg2.connect(
-            dbname=dbname,
-            user=user,
-            password=password,
-            host=host,
-            port=port
-        )
-        
-        # Create a cursor object
-        cursor = conn.cursor()
-
-        # Read BME280 sensor data
-        humidity, temperature = read_bme280_sensor()
-
-        # Update humidity and temperature in the User table
-        cursor.execute("UPDATE user SET pillboxHumidity = %s, pillboxTemperature = %s WHERE name = 'Admin'", (humidity, temperature,))
-        
-        # Commit the transaction
-        conn.commit()
-        
-        print("Humidity and temperature updated successfully.")
-        
-    except (Exception, psycopg2.Error) as error:
-        print("Error updating humidity and temperature in PostgreSQL:", error)
-        conn.rollback()
-    finally:
-        # Close the database connection
-        if conn:
-            cursor.close()
-            conn.close()
-
 # Main loop
 while listening:
-    with sr.Microphone() as source:
-        recognizer = sr.Recognizer()
-        recognizer.adjust_for_ambient_noise(source)
-        recognizer.dynamic_energy_threshold = 3000
+    try:
+        # Update humidity and temperature in the User table every 60 seconds
+        humidity, temperature_celsius = read_bme280_sensor()
+        update_humidity_temperature(humidity, temperature_celsius)
 
-        try:
+        with sr.Microphone() as source:
+            recognizer = sr.Recognizer()
+            recognizer.adjust_for_ambient_noise(source)
+            recognizer.dynamic_energy_threshold = 3000
+
             print("Listening...")
             audio = recognizer.listen(source, timeout=5.0)
             response = recognizer.recognize_google(audio)
@@ -228,23 +192,19 @@ while listening:
             elif "take my medicine" in response.lower():
                 update_intake_log()
 
-        except sr.WaitTimeoutError:
-            print("No command detected.")
+    except sr.WaitTimeoutError:
+        print("No command detected.")
 
-        except sr.UnknownValueError:
-            print("Could not understand the audio.")
+    except sr.UnknownValueError:
+        print("Could not understand the audio.")
 
-        except sr.RequestError as e:
-            print("Could not request results; {0}".format(e))
+    except sr.RequestError as e:
+        print("Could not request results; {0}".format(e))
 
-        except KeyboardInterrupt:
-            break
+    except KeyboardInterrupt:
+        break
 
-        except Exception as e:
-            print(e)
-
-        # Update humidity and temperature in the User table every 60 seconds
-        if datetime.now().second % 60 == 0:
-            update_humidity_temperature()
+    except Exception as e:
+        print(e)
 
 # Main loop ends

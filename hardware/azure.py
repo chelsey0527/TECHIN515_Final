@@ -1,14 +1,14 @@
 import os
 import psycopg2
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 import datetime
 
 # Load environment variables from .env file
-load_dotenv()
+load_dotenv(find_dotenv())
 
 # Database connection information
 dbname = os.getenv("DATABASE")
-user = os.getenv("USER")
+user = "chelsey"
 password = os.getenv("PASSWORD")
 host = os.getenv("HOST")
 port = os.getenv("PORT")
