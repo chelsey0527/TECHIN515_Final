@@ -55,24 +55,34 @@ def fetch_medication_data():
             host=host,
             port=port
         )
-        
-        # Create a cursor object
-        cursor = conn.cursor()
 
-        # Execute a query to fetch the last intake time and schedule for the user's medicine
-        cursor.execute("SELECT i.intaketime, p.scheduletimes FROM intakelog i JOIN pillcase p ON i.pillcaseid = p.id ORDER BY i.date DESC LIMIT 1")
-        
-        # Fetch the result
-        result = cursor.fetchone()
-        
-        return result
+        # Create a cursor
+        cur = conn.cursor()
+
+        # Get list of tables in the database
+        cur.execute('SELECT table_name FROM information_schema.tables WHERE table_schema = \'public\'')
+        tables = cur.fetchall()
+
+        # Fetch schedules of today from all pillcases
+        today = datetime.now().date()
+        medication_data = []
+
+        for table in tables:
+            table_name = table[0]
+            if table_name.startswith('pillcase'):
+                cur.execute(f"SELECT id, scheduletimes FROM {table_name} WHERE %s = ANY(scheduletimes::date[])", (today,))
+                results = cur.fetchall()
+                medication_data.extend(results)
+
+        return medication_data
+
     except (Exception, psycopg2.Error) as error:
         print("Error fetching data from PostgreSQL:", error)
         return None
     finally:
         # Close the database connection
         if conn:
-            cursor.close()
+            cur.close()
             conn.close()
 
 # Function to generate response based on medication intake data
@@ -80,15 +90,11 @@ def generate_medication_response():
     medication_data = fetch_medication_data()
 
     if medication_data:
-        last_intake_time, schedule_times = medication_data
-
-        if last_intake_time:
-            last_intake_time = last_intake_time.strftime("%Y-%m-%d %H:%M:%S")
-            next_intake_time = (last_intake_time + timedelta(hours=4)).strftime("%Y-%m-%d %H:%M:%S")
-
-            return f"The last time you took your medicine was at {last_intake_time}. Your next intake is due at {next_intake_time}."
-        else:
-            return "You haven't taken your medicine yet. Please take it as scheduled."
+        current_time = datetime.now().strftime("%H:%M:%S")
+        for pillcase_id, schedule_times in medication_data:
+            if current_time in schedule_times:
+                return f"Please take your pills from pillcase {pillcase_id} now."
+        return "No medication intake is scheduled at this time."
 
     else:
         return "No medication intake data found."
@@ -97,7 +103,7 @@ def generate_medication_response():
 def get_response(user_input):
     messages.append({"role": "user", "content": user_input})
     response = openai.Completion.create(
-        engine="text-davinci-003",
+        engine="gpt-3.5-turbo-0125",
         prompt=messages,
         temperature=0.5,
         max_tokens=50,
@@ -108,23 +114,6 @@ def get_response(user_input):
     ChatGPT_reply = response["choices"][0]["text"]
     messages.append({"role": "assistant", "content": ChatGPT_reply})
     return ChatGPT_reply
-
-# Function to check if the intake completion button is pressed
-def check_button_status():
-    button_status = lgpio.gpio_read(h, BUTTON_GPIO_PIN)
-    return button_status
-
-# Function to turn on the lights based on scheduled time
-def turn_on_lights(scheduled_time):
-    current_time = datetime.now()
-
-    # Check if the scheduled time is the same as the current time
-    if scheduled_time == current_time:
-        for pin in RELAY_GPIO_PINS:
-            lgpio.gpio_write(h, pin, 1)
-        print(f"Time to take your medicine from case {caseNo}")
-    elif scheduled_time != current_time or button_status == 1:
-        turn_off_lights()  # Turn off the lights if scheduled time != now
 
 # Function to turn off the lights
 def turn_off_lights():
@@ -149,11 +138,12 @@ def update_intake_log():
         cursor = conn.cursor()
 
         # Fetch the pillcase ID of the medicine currently being taken
-        cursor.execute("SELECT id FROM pillcase WHERE caseNo = 2")  # Assuming caseNo is 2 for Tylenol
-        pillcase_id = cursor.fetchone()[0]
+        cursor.execute("SELECT id FROM pillcase WHERE %s = ANY(scheduletimes::date[])", (datetime.now().date(),))
+        pillcase_ids = cursor.fetchall()
 
-        # Update the intake log
-        cursor.execute("UPDATE intakelog SET intaketime = NOW(), isintaked = True WHERE pillcaseid = %s", (pillcase_id,))
+        # Update the intake log for all pillcases scheduled for today
+        for pillcase_id, in pillcase_ids:
+            cursor.execute("UPDATE intakelog SET intaketime = NOW(), isintaked = True WHERE pillcaseid = %s", (pillcase_id,))
         
         # Commit the transaction
         conn.commit()
