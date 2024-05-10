@@ -1,7 +1,9 @@
 psycopg2-binary
+pyaudio
 lgpio
-speech_recognition
+SpeechRecognition
 pyttsx3
+grrs
 openai
 python-dotenv
 asyncio
