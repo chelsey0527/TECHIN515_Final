@@ -6,7 +6,9 @@ import pyttsx3
 import openai
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
-from humidity import read_bme280_sensor
+import board
+import time
+from adafruit_bme280 import basic as adafruit_bme280
 
 load_dotenv()
 
@@ -159,6 +161,41 @@ def update_intake_log():
             cursor.close()
             conn.close()
 
+# Function to update humidity and temperature in the User table
+def update_humidity_temperature():
+    try:
+        # Connect to your Azure PostgreSQL database
+        conn = psycopg2.connect(
+            dbname=dbname,
+            user=user,
+            password=password,
+            host=host,
+            port=port
+        )
+        
+        # Create a cursor object
+        cursor = conn.cursor()
+
+        # Read BME280 sensor data
+        humidity, temperature = read_bme280_sensor()
+
+        # Update humidity and temperature in the User table
+        cursor.execute("UPDATE user SET pillboxHumidity = %s, pillboxTemperature = %s WHERE name = 'Admin'", (humidity, temperature,))
+        
+        # Commit the transaction
+        conn.commit()
+        
+        print("Humidity and temperature updated successfully.")
+        
+    except (Exception, psycopg2.Error) as error:
+        print("Error updating humidity and temperature in PostgreSQL:", error)
+        conn.rollback()
+    finally:
+        # Close the database connection
+        if conn:
+            cursor.close()
+            conn.close()
+
 # Main loop
 while listening:
     with sr.Microphone() as source:
@@ -201,3 +238,15 @@ while listening:
 
         except sr.RequestError as e:
             print("Could not request results; {0}".format(e))
+
+        except KeyboardInterrupt:
+            break
+
+        except Exception as e:
+            print(e)
+
+        # Update humidity and temperature in the User table every 60 seconds
+        if datetime.now().second % 60 == 0:
+            update_humidity_temperature()
+
+# Main loop ends
