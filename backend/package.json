@@ -4,13 +4,14 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "dev": "nodemon src/index.ts",
-    "migrate": "prisma migrate dev"
+    "dev": "TZ='America/Los_Angeles' nodemon src/index.ts",
+    "migrate": "TZ='America/Los_Angeles' prisma migrate dev"
   },
   "dependencies": {
     "@prisma/client": "^5.13.0",
     "axios": "^1.6.8",
     "express": "^4.19.2",
+    "moment-timezone": "^0.5.45",
     "node-cron": "^3.0.3"
   },
   "devDependencies": {
