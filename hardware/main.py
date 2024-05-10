@@ -6,9 +6,7 @@ import pyttsx3
 import openai
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
-import board
-import time
-from adafruit_bme280 import basic as adafruit_bme280
+
 
 load_dotenv()
 
