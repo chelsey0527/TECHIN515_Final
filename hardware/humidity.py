@@ -1,22 +1,43 @@
-import board
 import time
-from adafruit_bme280 import basic as adafruit_bme280
+import smbus2
+import bme280
 
-def read_bme280_sensor():
+# BME280 sensor address (default address)
+address = 0x76
+
+# Initialize I2C bus
+bus = smbus2.SMBus(1)
+
+# Load calibration parameters
+calibration_params = bme280.load_calibration_params(bus, address)
+
+def celsius_to_fahrenheit(celsius):
+    return (celsius * 9/5) + 32
+
+while True:
     try:
-        # Create sensor object, using the board's default I2C bus.
-        i2c = board.I2C()   # uses board.SCL and board.SDA
-        bme280 = adafruit_bme280.Adafruit_BME280_I2C(i2c)
+        # Read sensor data
+        data = bme280.sample(bus, address, calibration_params)
 
-        # change this to match the location's pressure (hPa) at sea level
-        bme280.sea_level_pressure = 1013.25
+        # Extract temperature, pressure, and humidity
+        temperature_celsius = data.temperature
+        pressure = data.pressure
+        humidity = data.humidity
 
-        # Reading sensor data
-        humidity = bme280.relative_humidity
-        temperature = bme280.temperature
+        # Convert temperature to Fahrenheit
+        temperature_fahrenheit = celsius_to_fahrenheit(temperature_celsius)
 
-        return humidity, temperature
+        # Print the readings
+        print("Temperature: {:.2f} °C, {:.2f} °F".format(temperature_celsius, temperature_fahrenheit))
+        print("Pressure: {:.2f} hPa".format(pressure))
+        print("Humidity: {:.2f} %".format(humidity))
 
+        # Wait for a few seconds before the next reading
+        time.sleep(2)
+
+    except KeyboardInterrupt:
+        print('Program stopped')
+        break
     except Exception as e:
-        print("Error reading BME280 sensor:", e)
-        return None, None
+        print('An unexpected error occurred:', str(e))
+        break
