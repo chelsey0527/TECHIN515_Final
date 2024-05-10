@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
-import { scheduler } from "timers/promises";
+import moment from "moment-timezone";
 
 const prisma = new PrismaClient();
 
@@ -64,6 +64,7 @@ export const scheduleDailyIntakeLogs = async (user_id) => {
             }
         });
         console.log('Pillcases found:', JSON.stringify(pillcases, null, 2)); // This will format the output nicely
+        const date = moment().tz("America/Los_Angeles").format("YYYY-MM-DD");
 
         const logsToCreate = pillcases.flatMap(pillcase =>
             pillcase.scheduleTimes.map(scheduleTime => ({
@@ -71,6 +72,7 @@ export const scheduleDailyIntakeLogs = async (user_id) => {
                 userId: userId,
                 intakeTime: null, // set into null
                 isIntaked: false,
+                scheduleDate: date,
                 scheduleTime: scheduleTime // Converts the scheduleTime to string
             }))
         );

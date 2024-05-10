@@ -44,7 +44,8 @@ model IntakeLog {
   pillcase     Pillcase  @relation(fields: [pillcaseId], references: [id])
   intakeTime   DateTime? // The actual time the medication was taken
   isIntaked    Boolean   @default(false) // Whether the dose was taken
-  scheduleTime String? // The date of the intake
+  scheduleDate String? // The date of the scheduled intake
+  scheduleTime String? // The time of the scheduled intake
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 }
