@@ -6,7 +6,7 @@ import pyttsx3
 import openai
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
-
+from hardware.humidity import read_bme280_sensor
 
 load_dotenv()
 
