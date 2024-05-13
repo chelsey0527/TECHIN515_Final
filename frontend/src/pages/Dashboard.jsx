@@ -34,14 +34,16 @@ export default function Dashboard() {
   }, [homeData.data]); // Listening specifically to homeData.data
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <div className=" h-screen w-full bg-gray-100 ">Loading...</div>;
   }
 
   return (
-    <div className="h-screen w-full bg-gray-100 ">
+    <div className=" h-screen w-full bg-gray-100 ">
       <div className="px-6 pb-4 pt-10">
         <div className="container px-4 mx-auto">
-          <h2 className="text-2xl font-bold">Welcome, John Smith 👋</h2>
+          <h2 className="text-2xl font-bold">
+            Welcome, {homeData.data?.name} 👋
+          </h2>
         </div>
       </div>
 
