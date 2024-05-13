@@ -7,7 +7,7 @@
     "dev": "TZ='America/Los_Angeles' nodemon src/index.ts",
     "start": "tsc && node dist/index.js",
     "build": "tsc -p tsconfig.json",
-    "migrate": "TZ='America/Los_Angeles' prisma migrate deploy",
+    "migrate": "prisma migrate deploy",
     "predeploy": "npm run build"
   },
   "dependencies": {
