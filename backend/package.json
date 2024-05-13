@@ -1,11 +1,11 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/index.js",
   "license": "MIT",
   "scripts": {
     "dev": "TZ='America/Los_Angeles' nodemon src/index.ts",
-    "start": "tsc && node build/index.js",
+    "start": "tsc && node dist/index.js",
     "build": "tsc -p tsconfig.json",
     "migrate": "TZ='America/Los_Angeles' prisma migrate deploy",
     "predeploy": "npm run build"

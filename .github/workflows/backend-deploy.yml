@@ -23,14 +23,21 @@ jobs:
         with:
           node-version: "18.x"
 
-      - name: Install Dependencies
-        run: npm install
+      - name: npm install, build, and test
+        run: |
+          npm install
+          npm run build --if-present
+          npm run test --if-present
 
-      # - name: Build Project
-      #   run: npm run build
-
-      # - name: List output files
-      #   run: ls -alh dist # Debugging step to list contents of the dist directory
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v2
+        with:
+          name: node-app
+          path: .
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v2
+        with:
+          name: node-app
 
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v2
