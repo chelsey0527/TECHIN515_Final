@@ -17,6 +17,11 @@ module.exports = {
     "react-refresh/only-export-components": [
       "warn",
       { allowConstantExport: true },
+      {
+        globals: {
+          process: "readonly",
+        },
+      },
     ],
   },
 };

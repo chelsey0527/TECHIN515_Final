@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Heart, Gauge, Clock3, ArrowRight, Settings } from "lucide-react";
+import { Gauge, Clock3, ArrowRight, Settings } from "lucide-react";
 import { motion } from "framer-motion";
+import logo from "../../public/logo.svg";
 
 const navLinks = [
   {
@@ -22,8 +23,8 @@ const navLinks = [
 ];
 
 const variants = {
-  expanded: { width: "20%" },
-  nonExpanded: { width: "5%" },
+  expanded: { width: "30%" },
+  nonExpanded: { width: "6%" },
 };
 
 export default function NavigationBar() {
@@ -41,7 +42,7 @@ export default function NavigationBar() {
         }
       >
         <div className="logo-div flex space-x-3 items-center font-bold border-b-2 pb-4 ">
-          <Heart className="text-[#382CDD]" />
+          <img className="w-10" src={logo} />
           <span
             className={" text-[#382CDD] " + (isExpanded ? "block" : "hidden")}
           >
