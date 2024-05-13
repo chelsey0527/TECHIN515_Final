@@ -29,8 +29,8 @@ jobs:
       # - name: Build Project
       #   run: npm run build
 
-      - name: List output files
-        run: ls -alh dist # Debugging step to list contents of the dist directory
+      # - name: List output files
+      #   run: ls -alh dist # Debugging step to list contents of the dist directory
 
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v2

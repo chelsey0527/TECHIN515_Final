@@ -4,6 +4,8 @@
     "target": "es2017",
     "moduleResolution": "node",
     "module": "commonjs",
+    "baseUrl": "src",
+    "outDir": "dist",
     "lib": ["es2017", "esnext.asynciterable"],
     "typeRoots": ["node_modules/@types"],
     "allowSyntheticDefaultImports": true,
@@ -16,9 +18,7 @@
     "allowJs": true,
     "noEmit": false,
     "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "baseUrl": "src",
-    "outDir": "dist"
+    "resolveJsonModule": true
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules"]
