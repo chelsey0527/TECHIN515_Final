@@ -7,8 +7,7 @@
     "dev": "nodemon src/index.ts",
     "start": "tsc && node dist/index.js",
     "build": "tsc -p tsconfig.json",
-    "migrate": "prisma migrate deploy",
-    "predeploy": "npm run build"
+    "migrate": "prisma migrate deploy"
   },
   "dependencies": {
     "@prisma/client": "^5.13.0",
