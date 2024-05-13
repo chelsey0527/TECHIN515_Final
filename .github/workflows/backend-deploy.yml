@@ -10,10 +10,10 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: backend
     steps:
+      - name: Move to backend folder
+        uses: cd backend
+
       - name: Checkout Source
         uses: actions/checkout@v3
 
@@ -27,6 +27,9 @@ jobs:
 
       - name: Build Project
         run: npm run build
+
+      - name: List output files
+        run: ls -alh dist # Debugging step to list contents of the dist directory
 
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v2
