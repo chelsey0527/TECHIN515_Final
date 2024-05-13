@@ -64,9 +64,7 @@ export default function NavigationBar() {
               key={index}
               className={
                 "flex space-x-3 p-2 rounded" +
-                (activeNavIndex === index
-                  ? " bg-[#382CDD] text-white font-semibold"
-                  : "")
+                (activeNavIndex === index ? " bg-[#382CDD] text-white" : "")
               }
               onClick={() => setActiveNavIndex(index)}
             >

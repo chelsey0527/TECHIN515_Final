@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import PillboxCard from "../components/PillboxCard";
 
-const BASE_URL = "https://techin515.azurewebsites.net";
+const BASE_URL = "http://localhost:8080";
 
 export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(false);
