@@ -13,12 +13,12 @@
     "pretty": true,
     "sourceMap": true,
     "declaration": true,
-    "outDir": "./dist",
     "allowJs": true,
     "noEmit": false,
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "baseUrl": "src"
+    "baseUrl": "src",
+    "outDir": "./dist"
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules"]
