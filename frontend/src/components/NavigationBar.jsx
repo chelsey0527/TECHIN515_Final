@@ -1,18 +1,12 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  Heart,
-  LayoutDashboard,
-  Clock3,
-  ArrowRight,
-  Settings,
-} from "lucide-react";
+import { Heart, Gauge, Clock3, ArrowRight, Settings } from "lucide-react";
 import { motion } from "framer-motion";
 
 const navLinks = [
   {
     name: "Dashboard",
-    icon: LayoutDashboard,
+    icon: Gauge,
     path: "/dashboard",
   },
   {

@@ -9,7 +9,7 @@ import Settings from "./pages/Settings";
 function App() {
   return (
     <BrowserRouter>
-      <main className="h-screen flex">
+      <main className="h-screen w-full flex">
         <NavigationBar />
         <Routes>
           <Route path="/" element={<Dashboard />} />

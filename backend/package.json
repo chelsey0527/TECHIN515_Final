@@ -5,7 +5,10 @@
   "license": "MIT",
   "scripts": {
     "dev": "TZ='America/Los_Angeles' nodemon src/index.ts",
-    "migrate": "TZ='America/Los_Angeles' prisma migrate dev"
+    "start": "tsc && node build/index.js",
+    "build": "tsc",
+    "migrate": "TZ='America/Los_Angeles' prisma migrate deploy",
+    "predeploy": "npm run build"
   },
   "dependencies": {
     "@prisma/client": "^5.13.0",
