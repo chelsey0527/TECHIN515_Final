@@ -4,7 +4,7 @@
   "main": "dist/index.js",
   "license": "MIT",
   "scripts": {
-    "dev": "TZ='America/Los_Angeles' nodemon src/index.ts",
+    "dev": "nodemon src/index.ts",
     "start": "tsc && node dist/index.js",
     "build": "tsc -p tsconfig.json",
     "migrate": "prisma migrate deploy",
