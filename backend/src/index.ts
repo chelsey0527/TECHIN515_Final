@@ -44,7 +44,7 @@ app.use("/device", deviceRouter);
 //     });
 
 app.listen(port, () => {
-  console.log(`server running on ${port}`);
+  console.log(`server running on ${port} !`);
   // task.start();
   // testTask.start();
 });
