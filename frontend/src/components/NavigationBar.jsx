@@ -23,7 +23,7 @@ const navLinks = [
 ];
 
 const variants = {
-  expanded: { width: "30%" },
+  expanded: { width: "25%" },
   nonExpanded: { width: "6%" },
 };
 
@@ -51,7 +51,7 @@ export default function NavigationBar() {
         animate={isExpanded ? "expanded" : "nonExpanded"}
         variants={variants}
         className={
-          " py-12 flex flex-col border border-r-1 w-1/5 h-screen relative " +
+          " py-12 flex flex-col border border-r-1 w-1/5 h-full relative " +
           (isExpanded ? " px-5 " : " px-2 ")
         }
       >
