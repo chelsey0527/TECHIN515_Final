@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Gauge, Clock3, ArrowRight, Settings } from "lucide-react";
 import { motion } from "framer-motion";
@@ -30,6 +30,20 @@ const variants = {
 export default function NavigationBar() {
   const [activeNavIndex, setActiveNavIndex] = useState(0);
   const [isExpanded, setIsExpanded] = useState(true);
+
+  useEffect(() => {
+    // Retrieve the active navigation index from localStorage
+    const savedIndex = localStorage.getItem("activeNavIndex");
+    if (savedIndex !== null) {
+      setActiveNavIndex(parseInt(savedIndex, 10));
+    }
+  }, []);
+
+  const handleNavClick = (index) => {
+    setActiveNavIndex(index);
+    // Save the active navigation index to localStorage
+    localStorage.setItem("activeNavIndex", index);
+  };
 
   return (
     <>
@@ -66,7 +80,7 @@ export default function NavigationBar() {
                 "flex space-x-3 p-2 rounded" +
                 (activeNavIndex === index ? " bg-[#382CDD] text-white" : "")
               }
-              onClick={() => setActiveNavIndex(index)}
+              onClick={() => handleNavClick(index)}
             >
               <item.icon />
               <span className={isExpanded ? "block" : "hidden"}>
