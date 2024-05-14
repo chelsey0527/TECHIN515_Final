@@ -46,6 +46,7 @@ model IntakeLog {
   isIntaked    Boolean   @default(false) // Whether the dose was taken
   scheduleDate String? // The date of the scheduled intake
   scheduleTime String? // The time of the scheduled intake
+  status       String?    @default("Pending")
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 }
