@@ -15,11 +15,11 @@ const navLinks = [
     icon: Clock3,
     path: "/intake-history",
   },
-  {
-    name: "Settings",
-    icon: Settings,
-    path: "/settings",
-  },
+  // {
+  //   name: "Settings",
+  //   icon: Settings,
+  //   path: "/settings",
+  // },
 ];
 
 const variants = {

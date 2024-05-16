@@ -66,17 +66,19 @@ export default function Dashboard() {
       <h1 className="font-bold font-heading container mx-auto px-10 pt-8 text-4xl">
         Storage Environment
       </h1>
-      <div className="container px-6 mx-auto">
-        <section className="py-3">
-          <StorageEnvCard
-            props={{
-              ...homeData.data,
-              pillboxHumidity: homeData.data?.pillboxHumidity ?? "NaN",
-              pillboxTemperature: homeData.data?.pillboxTemperature ?? "Nan",
-            }}
-          />
-        </section>
-      </div>
+      <section className="py-3">
+        <div className="container mx-auto">
+          <div className="flex flex-wrap m-8">
+            <StorageEnvCard
+              props={{
+                ...homeData.data,
+                pillboxHumidity: homeData.data?.pillboxHumidity ?? "NaN",
+                pillboxTemperature: homeData.data?.pillboxTemperature ?? "Nan",
+              }}
+            />
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
