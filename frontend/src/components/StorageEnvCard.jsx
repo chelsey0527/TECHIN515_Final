@@ -14,7 +14,7 @@ export default function storageCard({ ...props }) {
             <span className="inline-block mx-auto">
               <img classNameName="w-10" src={humidityIcon} />
             </span>
-            <h3 className="mt-3 mb-1 text-3xl font-bold">{humidity}</h3>
+            <h3 className="mt-3 mb-1 text-3xl font-bold">{humidity} %</h3>
             <p className="text-sm text-gray-600 font-medium">Room Humidity</p>
           </div>
         </div>
@@ -23,7 +23,7 @@ export default function storageCard({ ...props }) {
             <span className="inline-block mx-auto">
               <img classNameName="w-10" src={temperatureIcon} />
             </span>
-            <h3 className="mt-3 mb-1 text-3xl font-bold">{temperature}</h3>
+            <h3 className="mt-3 mb-1 text-3xl font-bold">{temperature} °C</h3>
             <p className="text-sm text-gray-600 font-medium">
               Room Temperature
             </p>
