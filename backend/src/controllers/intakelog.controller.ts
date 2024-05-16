@@ -43,7 +43,7 @@ export const getIntakelogData = async (
         doses: true,
         IntakeLog: {
           orderBy: {
-            scheduleDate: "desc", // or 'desc' for descending order
+            scheduleTime: "desc", // or 'desc' for descending order
           },
           select: {
             id: true,
@@ -70,7 +70,7 @@ export const getIntakelogData = async (
           );
 
           // Update status in the database only when the status change and its not "Missed" to prevent repetitive work
-          if (log.status !== status && log.status !== "Missed") {
+          if (log.status !== status && log.status == "Pending") {
             await prisma.intakeLog.update({
               where: { id: log.id },
               data: { status: status },

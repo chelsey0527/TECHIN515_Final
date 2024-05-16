@@ -54,6 +54,9 @@ export default function IntakeHistory() {
       <div className="py-8 px-6">
         <div className="container px-4 mx-auto">
           <h2 className="font-bold text-4xl">Intake History</h2>
+          <p className="mb-2 mb-2 font-heading container mt-2 mx-auto">
+            Your record of medication history
+          </p>
         </div>
       </div>
       <section className="pb-8">

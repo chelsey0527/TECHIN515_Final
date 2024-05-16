@@ -35,10 +35,10 @@ export default function IntakeHistoryTable({ data }) {
         {data?.map((item, index) => {
           const statusColor =
             item.status === "Completed"
-              ? "bg-green-500"
+              ? "bg-[#17BB84]"
               : item.status === "Missed"
-              ? "bg-red-500"
-              : "bg-orange-500";
+              ? "bg-[#E85444]"
+              : "bg-[#F67A28]";
 
           return (
             <tr
