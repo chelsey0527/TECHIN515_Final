@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Gauge, Clock3, ArrowRight, Settings } from "lucide-react";
 import { motion } from "framer-motion";
-import logo from "../../public/logo.svg";
+import logo from "/logo.svg";
 
 const navLinks = [
   {

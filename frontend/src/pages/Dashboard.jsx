@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import PillboxCard from "../components/PillboxCard";
+import StorageEnvCard from "../components/StorageEnvCard";
 
 const BASE_URL = "http://localhost:8080";
 
@@ -63,21 +64,12 @@ export default function Dashboard() {
 
       {/* Device */}
       <h1 className="font-bold font-heading container mx-auto px-10 pt-8 text-4xl">
-        Device condition
+        Storage Environment
       </h1>
       <div className="container px-4 mx-auto">
-        <div className="flex flex-wrap -mx-4 -mb-4 md:mb-0">
-          <div className="w-full md:w-1/3 px-4 mb-4 md:mb-0 ml-6"></div>
-          <div className="w-full md:w-2/3 px-4 mb-4 md:mb-0"></div>
-        </div>
-        <div className="flex flex-wrap px-4 mx-auto flex-col">
-          <h2 className="ml-2 mr-2">
-            Humidity: {homeData.data?.pillboxHumidity}
-          </h2>
-          <h2 className="ml-2 mr-2">
-            Temperature: {homeData.data?.pillboxTemperature}
-          </h2>
-        </div>
+        <section className="py-3">
+          <StorageEnvCard props={homeData.data} />
+        </section>
       </div>
     </div>
   );
