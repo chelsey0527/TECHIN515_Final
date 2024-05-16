@@ -5,6 +5,7 @@ import NavigationBar from "./components/NavigationBar";
 import Dashboard from "./pages/Dashboard";
 import IntakeHistory from "./pages/IntakeHistory";
 import Settings from "./pages/Settings";
+import PillboxEdit from "./pages/PillboxEdit";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/intake-history" element={<IntakeHistory />} />
+          <Route path="/pillbox/edit/:boxId" element={<PillboxEdit />} />
           <Route path="/settings" element={<Settings />} />
         </Routes>
       </main>

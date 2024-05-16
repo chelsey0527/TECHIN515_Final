@@ -1,7 +1,7 @@
+import { Link } from "react-router-dom";
+import { convertTo12HourFormat } from "../utils/timeUtils";
 import editIcon from "../assets/editIcon.svg";
 import pillIcon from "../assets/pillIcon.svg";
-
-import { convertTo12HourFormat } from "../utils/timeUtils";
 
 export default function PillboxCard({ ...props }) {
   console.log(props);
@@ -17,19 +17,16 @@ export default function PillboxCard({ ...props }) {
         <div class="flex mb-2 inline-block justify-between items-center">
           <div class="flex">
             <span class="mr-2 py-1">
-              <a href="forms.html">
-                <img src={editIcon} />
-              </a>
+              <img src={pillIcon} />
             </span>
             <h3 class="text-sm text-gray-600 py-1">Box {boxNo}</h3>
           </div>
-          <a
-            href="forms.html"
-            type="button"
-            class="text-gray-500 bg-gray-50 rounded-md p-2 hover:bg-blue-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          <Link
+            to={`/pillbox/edit/${boxId}`}
+            className="text-gray-500 bg-gray-50 rounded-md p-2 hover:bg-blue-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
-            <img src={pillIcon} />
-          </a>
+            <img src={editIcon} alt="Edit" />
+          </Link>
         </div>
         <h2 class="mb-2 text-3xl font-bold mb-4">{pillName}</h2>
         <span class="text-gray-400 text-xs flex mb-1">
