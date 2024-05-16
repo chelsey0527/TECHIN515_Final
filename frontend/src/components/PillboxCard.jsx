@@ -36,7 +36,7 @@ export default function PillboxCard({ ...props }) {
           <span class="text-gray-400 text-xs inline-block">
             {scheduleTimes.map((time, index) => (
               <span key={index} className="text-gray-400 text-xs inline-block">
-                {convertTo12HourFormat(time.replace(/'/g, ""))}
+                {convertTo12HourFormat(time)}
                 {index < scheduleTimes.length - 1 && <>&nbsp;/&nbsp;</>}
               </span>
             ))}

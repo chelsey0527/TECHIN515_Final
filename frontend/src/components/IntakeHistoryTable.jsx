@@ -11,6 +11,8 @@ export default function IntakeHistoryTable({ data }) {
   ];
   // console.log("inside table", data);
 
+  console.log(data);
+
   return (
     <table className="table-auto w-full">
       <thead>

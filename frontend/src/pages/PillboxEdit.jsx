@@ -1,17 +1,13 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import {
-  convertTo12HourFormat,
-  convertTo24HourFormat,
-} from "../utils/timeUtils";
-import dropdowIcon from "../assets/dropdownIcon.svg";
-import MainButton from "./Button/MainButton";
+import { convertTo24HourFormat } from "../utils/timeUtils";
+// import dropdowIcon from "../assets/dropdownIcon.svg";
+// import MainButton from "./Button/MainButton";
 
 const BASE_URL = "http://localhost:8080";
 
 export default function PillboxEdit() {
   const { boxId } = useParams();
-  const [pillcaseData, setPillcaseData] = useState({});
   const [pillName, setPillName] = useState();
   const [boxNo, setBoxNo] = useState();
   const [scheduleTimes, setScheduledTimes] = useState([]);
@@ -21,13 +17,15 @@ export default function PillboxEdit() {
       try {
         const response = await fetch(`${BASE_URL}/pillcases/${boxId}`);
         const data = await response.json();
-        setPillcaseData(data);
         setPillName(data.data.pillName);
         setBoxNo(data.data.caseNo);
         const formattedTimes = data.data.scheduleTimes.map(
-          (time) => convertTo24HourFormat(time.replace(/'/g, "")) // Remove single quotes and convert
+          (time) => convertTo24HourFormat(time) // Remove single quotes and convert
         );
-        setScheduledTimes(formattedTimes);
+        setScheduledTimes([
+          ...formattedTimes,
+          ...Array(3 - formattedTimes.length).fill(""),
+        ]);
       } catch (e) {
         console.error(e);
       } finally {
@@ -37,8 +35,10 @@ export default function PillboxEdit() {
     fetchPillCaseById();
   }, []);
 
+  // Update data by Id
   const updatePillcaseById = async (event) => {
     event.preventDefault(); // Prevent the form from submitting the default way
+    const filteredTimes = scheduleTimes.filter((time) => time !== ""); // Only send times that have been set
     try {
       await fetch(`${BASE_URL}/pillcases/${boxId}`, {
         method: "PUT",
@@ -47,7 +47,7 @@ export default function PillboxEdit() {
         },
         body: JSON.stringify({
           pillName,
-          scheduleTimes,
+          filteredTimes,
         }),
       });
       alert("Update successful!");
@@ -97,6 +97,7 @@ export default function PillboxEdit() {
                   />
                 </div>
               </div>
+
               {/* Medication name */}
               <label className="block text-sm font-medium">
                 Medication Name
@@ -109,6 +110,7 @@ export default function PillboxEdit() {
                 value={`${pillName}`}
                 onChange={handlePillNameChange}
               />
+
               {/* Schedule Times */}
               <span className="text-xs text-red-500"> *Required</span>
               {scheduleTimes.map((time, index) => (
@@ -184,6 +186,8 @@ export default function PillboxEdit() {
                 Note: Your dose will appear missing on the intake history, if
                 it's after the intake duration.
               </h5>
+
+              {/* Submit button */}
               <button
                 className="inline-block w-full md:w-auto mt-10 px-6 p-3 font-medium text-white bg-indigo-500 hover:bg-indigo-600 rounded transition duration-200"
                 type="submit"
