@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import PillboxCard from "../components/PillboxCard";
-import StorageEnvCard from "../components/StorageEnvCard";
+// import StorageEnvCard from "../components/StorageEnvCard";
 
 const BASE_URL = "http://localhost:8080";
 
@@ -68,7 +68,7 @@ export default function Dashboard() {
       </h1>
       <div className="container px-4 mx-auto">
         <section className="py-3">
-          <StorageEnvCard props={homeData.data} />
+          {/* <StorageEnvCard props={homeData.data} /> */}
         </section>
       </div>
     </div>
