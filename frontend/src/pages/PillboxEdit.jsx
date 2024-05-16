@@ -1,15 +1,14 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { convertTo24HourFormat } from "../utils/timeUtils";
-// import dropdowIcon from "../assets/dropdownIcon.svg";
-// import MainButton from "./Button/MainButton";
 
 const BASE_URL = "http://localhost:8080";
 
 export default function PillboxEdit() {
   const { boxId } = useParams();
-  const [pillName, setPillName] = useState();
   const [boxNo, setBoxNo] = useState();
+  const [pillName, setPillName] = useState();
+  const [doses, setDoses] = useState();
   const [scheduleTimes, setScheduledTimes] = useState([]);
 
   useEffect(() => {
@@ -17,8 +16,9 @@ export default function PillboxEdit() {
       try {
         const response = await fetch(`${BASE_URL}/pillcases/${boxId}`);
         const data = await response.json();
-        setPillName(data.data.pillName);
         setBoxNo(data.data.caseNo);
+        setPillName(data.data.pillName);
+        setDoses(data.data.doses);
         const formattedTimes = data.data.scheduleTimes.map(
           (time) => convertTo24HourFormat(time) // Remove single quotes and convert
         );
@@ -47,6 +47,7 @@ export default function PillboxEdit() {
         },
         body: JSON.stringify({
           pillName,
+          doses,
           filteredTimes,
         }),
       });
@@ -65,6 +66,10 @@ export default function PillboxEdit() {
 
   const handlePillNameChange = (event) => {
     setPillName(event.target.value);
+  };
+
+  const handleDosesChange = (event) => {
+    setDoses(event.target.value);
   };
 
   console.log(pillName, boxNo, scheduleTimes);
@@ -111,6 +116,19 @@ export default function PillboxEdit() {
                 onChange={handlePillNameChange}
               />
 
+              {/* Doses */}
+              <label className="block text-sm font-medium">
+                Doses
+                <span className="text-xs text-red-500"> *Required</span>
+              </label>
+              <input
+                className="block w-full px-4 py-3 mb-6 text-sm placeholder-gray-500 bg-white border rounded mb-5"
+                type="text"
+                name="doses"
+                value={`${doses}`}
+                onChange={handleDosesChange}
+              />
+
               {/* Schedule Times */}
               <span className="text-xs text-red-500"> *Required</span>
               {scheduleTimes.map((time, index) => (
@@ -132,60 +150,9 @@ export default function PillboxEdit() {
                       onChange={(e) => handleTimeChange(index, e)}
                       required=""
                     />
-                    {/* <button
-                      id="dropdown-duration-button"
-                      data-dropdown-toggle="dropdown-duration"
-                      className="flex-shrink-0 z-10 inline-flex items-center py-2.5 px-4 text-sm font-medium text-center text-gray-900 border rounded-e-lg hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 border bg-gray-50"
-                      type="button"
-                    >
-                      Intake Duration
-                      <img
-                        className="ml-2"
-                        src={dropdowIcon}
-                        alt="Dropdown Icon"
-                      />
-                    </button>
-                    <div
-                      id="dropdown-duration"
-                      className="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-36 dark:bg-gray-700"
-                    >
-                      <ul
-                        className="py-2 text-sm text-gray-700 dark:text-gray-200"
-                        aria-labelledby="dropdown-duration-button"
-                      >
-                        <li>
-                          <button
-                            type="button"
-                            className="inline-flex w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600 dark:hover:text-white"
-                          >
-                            30 minutes
-                          </button>
-                        </li>
-                        <li>
-                          <button
-                            type="button"
-                            className="inline-flex w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600 dark:hover:text-white"
-                          >
-                            1 hour
-                          </button>
-                        </li>
-                        <li>
-                          <button
-                            type="button"
-                            className="inline-flex w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600 dark:hover:text-white"
-                          >
-                            2 hours
-                          </button>
-                        </li>
-                      </ul>
-                    </div> */}
                   </div>
                 </div>
               ))}
-              <h5 className="text-gray-500 text-sm py-1">
-                Note: Your dose will appear missing on the intake history, if
-                it's after the intake duration.
-              </h5>
 
               {/* Submit button */}
               <button

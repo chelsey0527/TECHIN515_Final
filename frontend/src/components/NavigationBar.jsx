@@ -51,18 +51,21 @@ export default function NavigationBar() {
         animate={isExpanded ? "expanded" : "nonExpanded"}
         variants={variants}
         className={
-          " py-12 flex flex-col border border-r-1 w-1/5 h-full relative " +
+          " py-12 flex flex-col  w-1/5 h-full relative  lg:border-b border-blue-50" +
           (isExpanded ? " px-5 " : " px-2 ")
         }
       >
-        <div className="logo-div flex space-x-3 items-center font-bold border-b-2 pb-4 ">
+        <Link
+          to={`/`}
+          className="logo-div flex space-x-3 items-center font-bold border-b-2 pb-4 "
+        >
           <img className="w-10" src={logo} />
           <span
             className={" text-[#382CDD] " + (isExpanded ? "block" : "hidden")}
           >
             Medibox
           </span>
-        </div>
+        </Link>
 
         <div
           onClick={() => setIsExpanded(!isExpanded)}
@@ -71,14 +74,16 @@ export default function NavigationBar() {
           <ArrowRight className="w-4 text-white" />
         </div>
 
-        <div className="mt-9 flex-col space-y-2">
+        <div className="mt-9 flex-col">
           {navLinks.map((item, index) => (
             <Link
               to={item.path}
               key={index}
               className={
-                "flex space-x-3 p-2 rounded" +
-                (activeNavIndex === index ? " bg-[#382CDD] text-white" : "")
+                " flex space-x-3 p-2 rounded text-sm " +
+                (activeNavIndex === index
+                  ? " bg-[#382CDD] text-white "
+                  : " text-gray-500 hover:bg-indigo-50 ")
               }
               onClick={() => handleNavClick(index)}
             >
