@@ -32,14 +32,19 @@ def read_bme280_sensor(address=0x76, bus_number=1):
         temperature_celsius = data.temperature
         pressure = data.pressure
         humidity = data.humidity
+        
+        # Round up the readings to integers
+        temperature_celsius = int(temperature_celsius)
+        pressure = int(pressure)
+        humidity = int(humidity)
                 
         # Convert temperature to Fahrenheit
         temperature_fahrenheit = celsius_to_fahrenheit(temperature_celsius)
                 
-        # Print the readings
-        print("Temperature: {:.2f} °C, {:.2f} °F".format(temperature_celsius, temperature_fahrenheit))
-        print("Pressure: {:.2f} hPa".format(pressure))
-        print("Humidity: {:.2f} %".format(humidity))
+        # Print the rounded readings
+        print("Temperature: {} °C, {:.2f} °F".format(temperature_celsius, temperature_fahrenheit))
+        print("Pressure: {} hPa".format(pressure))
+        print("Humidity: {} %".format(humidity))
 
         return humidity, temperature_celsius
                 
@@ -73,7 +78,9 @@ def update_humidity_temperature():
             for row in cursor.fetchall():
                 print(row)
 
-            cursor.execute('UPDATE "User" SET "pillboxHumidity" = %s, "pillboxTemperature" = %s WHERE name = %s', (humidity, temperature_celsius, "Admin"))
+            # Update humidity, temperature, and updatedAt
+            query = 'UPDATE "User" SET "pillboxHumidity" = %s, "pillboxTemperature" = %s, "updatedAt" = %s WHERE name = %s'
+            cursor.execute(query, (humidity, temperature_celsius, time.strftime('%Y-%m-%d %H:%M:%S'), "Admin"))
             
             # Commit the transaction
             conn.commit()
@@ -83,7 +90,7 @@ def update_humidity_temperature():
             print("Failed to read humidity and temperature data.")
         
     except (Exception, psycopg2.Error) as error:
-        print("Error updating humidity and temperature in PostgreSQL:", error)
+        print("Error updating humidity, temperature, and updatedAt in PostgreSQL:", error)
         if conn:  # Check if conn is not None
             conn.rollback()
     finally:

@@ -158,8 +158,8 @@ def update_intake_log():
 while listening:
     try:
         # Update humidity and temperature in the User table every 60 seconds
-        humidity, temperature_celsius = read_bme280_sensor()
-        update_humidity_temperature(humidity, temperature_celsius)
+        # humidity, temperature_celsius = read_bme280_sensor()
+        # update_humidity_temperature(humidity, temperature_celsius)
 
         with sr.Microphone() as source:
             recognizer = sr.Recognizer()
@@ -175,7 +175,7 @@ while listening:
                 response_from_openai = get_response(response)
                 engine.setProperty('rate', 120)
                 engine.setProperty('volume', volume)
-                engine.setProperty('voice', 'greek')
+                engine.setProperty('voice', 'english-us')
                 engine.say(response_from_openai)
                 engine.runAndWait()
 
