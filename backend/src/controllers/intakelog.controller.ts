@@ -38,12 +38,10 @@ export const getIntakelogData = async (
       },
       select: {
         id: true,
-        pillName: true,
-        caseNo: true,
-        doses: true,
+        caseNo: true, // Make sure to fetch the caseNo here for sorting
         IntakeLog: {
           orderBy: {
-            scheduleTime: "desc", // or 'desc' for descending order
+            scheduleTime: "desc", // Sorting by scheduleTime descending
           },
           select: {
             id: true,
@@ -52,52 +50,41 @@ export const getIntakelogData = async (
             scheduleTime: true,
             scheduleDate: true,
             status: true,
+            pillName: true,
+            doses: true,
           },
         },
       },
     });
 
     // Flatten the data structure to have each IntakeLog entry separate along with its associated Pillcase data
-    const flatIntakeLogs = await Promise.all(
-      pillcases.flatMap((pillcase) =>
-        pillcase.IntakeLog.map(async (log) => {
-          // Remove single quotation marks cause the time are stored in string
-          const formattedScheduleTime = log.scheduleTime.replace(/'/g, "");
-          const status = calculateStatus(
-            log.isIntaked,
-            log.scheduleDate,
-            formattedScheduleTime
-          );
-
-          // Update status in the database only when the status change and its not "Missed" to prevent repetitive work
-          if (log.status !== status && log.status == "Pending") {
-            await prisma.intakeLog.update({
-              where: { id: log.id },
-              data: { status: status },
-            });
-            log.status = status;
-          }
-
-          return {
-            pillcaseId: pillcase.id,
-            pillName: pillcase.pillName,
-            caseNo: pillcase.caseNo,
-            doses: pillcase.doses,
-            scheduleDate: log.scheduleDate,
-            scheduleTime: formattedScheduleTime,
-            intakeTime: log.intakeTime,
-            isIntaked: log.isIntaked,
-            status: log.status,
-          };
-        })
-      )
+    const flatIntakeLogs = pillcases.flatMap((pillcase) =>
+      pillcase.IntakeLog.map((log) => ({
+        pillcaseId: pillcase.id,
+        scheduleDate: log.scheduleDate,
+        scheduleTime: log.scheduleTime.replace(/'/g, ""), // Formatting time
+        intakeTime: log.intakeTime,
+        isIntaked: log.isIntaked,
+        status: log.status,
+        pillName: log.pillName,
+        caseNo: pillcase.caseNo, // Using caseNo from pillcase
+        doses: log.doses,
+      }))
     );
 
-    // Sort by scheduleDate first
+    // First, sort by scheduleDate in descending order
     flatIntakeLogs.sort(
       (a, b) =>
         new Date(b.scheduleDate).getTime() - new Date(a.scheduleDate).getTime()
     );
+
+    // Then, sort by caseNo in ascending order where scheduleDate is the same
+    flatIntakeLogs.sort((a, b) => {
+      if (a.scheduleDate === b.scheduleDate) {
+        return a.caseNo - b.caseNo; // Ensure caseNo is a number
+      }
+      return 0;
+    });
 
     // Paginate the sorted results
     const paginatedIntakeLogs = flatIntakeLogs.slice(skip, skip + limit);
@@ -125,6 +112,9 @@ export const scheduleDailyIntakeLogs = async (user_id) => {
       select: {
         id: true,
         scheduleTimes: true,
+        pillName: true,
+        caseNo: true,
+        doses: true,
       },
     });
     console.log("Pillcases found:", JSON.stringify(pillcases, null, 2));
@@ -139,13 +129,16 @@ export const scheduleDailyIntakeLogs = async (user_id) => {
         scheduleDate: date,
         scheduleTime: scheduleTime,
         status: "Pending",
+        pillName: pillcase.pillName,
+        caseNo: pillcase.caseNo,
+        doses: pillcase.doses,
       }))
     );
 
     // Create all logs using a single batch operation
     const createdLogs = await prisma.intakeLog.createMany({
       data: logsToCreate,
-      skipDuplicates: true, // Optional: skips records that would cause a duplicate error
+      skipDuplicates: true, // Skips records that would cause a duplicate error
     });
 
     console.log(`${createdLogs.count} intake logs created.`);

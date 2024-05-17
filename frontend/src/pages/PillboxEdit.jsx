@@ -47,8 +47,8 @@ export default function PillboxEdit() {
         },
         body: JSON.stringify({
           pillName,
-          doses,
-          filteredTimes,
+          doses: parseInt(doses, 10), // Ensure doses is an integer
+          scheduleTimes: filteredTimes,
         }),
       });
       alert("Update successful!");
