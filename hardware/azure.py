@@ -13,6 +13,9 @@ password = os.getenv("PASSWORD")
 host = os.getenv("HOST")
 port = os.getenv("PORT")
 
+def connect_to_database():
+    return psycopg2.connect(dbname=dbname, user=user, password=password, host=host, port=port)
+
 def print_table(rows, headers):
     if rows:
         print("\n" + "-"*80)
@@ -24,13 +27,7 @@ def print_table(rows, headers):
 
 try:
     # Connect to the database
-    conn = psycopg2.connect(
-        dbname=dbname,
-        user=user,
-        password=password,
-        host=host,
-        port=port
-    )
+    conn = connect_to_database()
 
     # Create a cursor
     cur = conn.cursor()

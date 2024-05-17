@@ -6,7 +6,8 @@ import pyttsx3
 import openai
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
-from humidity import read_bme280_sensor, update_humidity_temperature  # Import the read_bme280_sensor function
+from humidity import read_bme280_sensor, update_humidity_temperature
+from intake import fetch_daily_intake_schedule, get_pillcase_info, update_intake_log
 
 load_dotenv()
 
@@ -35,73 +36,22 @@ for pin in RELAY_GPIO_PINS:
 # Set up GPIO pin as input for the button
 lgpio.gpio_claim_input(h, BUTTON_GPIO_PIN)
 
-# Function to fetch medication intake data from the database
-def fetch_medication_data():
-    try:
-        # Connect to your Azure PostgreSQL database
-        conn = psycopg2.connect(
-            dbname=dbname,
-            user=user,
-            password=password,
-            host=host,
-            port=port
-        )
-
-        # Create a cursor
-        cur = conn.cursor()
-
-        # Get list of tables in the database
-        cur.execute('SELECT table_name FROM information_schema.tables WHERE table_schema = \'public\'')
-        tables = cur.fetchall()
-
-        # Fetch schedules of today from all pillcases
-        today = datetime.now().date()
-        medication_data = []
-
-        for table in tables:
-            table_name = table[0]
-            if table_name.startswith('pillcase'):
-                cur.execute(f"SELECT id, scheduletimes FROM {table_name} WHERE %s = ANY(scheduletimes::date[])", (today,))
-                results = cur.fetchall()
-                medication_data.extend(results)
-
-        return medication_data
-
-    except (Exception, psycopg2.Error) as error:
-        print("Error fetching data from PostgreSQL:", error)
-        return None
-    finally:
-        # Close the database connection
-        if conn:
-            cur.close()
-            conn.close()
+# Fetch daily intake schedule and store it
+daily_schedule = fetch_daily_intake_schedule()
+current_time = str(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 
 # Set your OpenAI API key and customize the ChatGPT role
 openai.api_key = os.getenv("OPENAI_API_KEY")
-messages = [{"role": "system", "content": "Your name is Tom and give answers in 2 lines. You will be provided with our database information. Answer based on the information provided."}]
+messages = [{"role": "system", "content": f"Your name is Tom and give answers in 2 lines. This is the intake schedule for today: {daily_schedule}. Answer based on this schedule."}]
 
 # Customizing the output voice
 voices = engine.getProperty('voices')
 rate = engine.getProperty('rate')
 volume = engine.getProperty('volume')
 
-# Function to generate response based on medication intake data
-def generate_medication_response():
-    medication_data = fetch_medication_data()
-
-    if medication_data:
-        current_time = datetime.now().strftime("%H:%M:%S")
-        for pillcase_id, schedule_times in medication_data:
-            if current_time in schedule_times:
-                return f"Please take your pills from pillcase {pillcase_id} now."
-        return "No medication intake is scheduled at this time."
-
-    else:
-        return "No medication intake data found."
-
 # Function to get response from OpenAI ChatGPT
 def get_response(user_input):
-    messages.append({"role": "user", "content": user_input})
+    messages.append({"role": "user", "content": f"It's {current_time}. This is my intake log: {daily_schedule}. {user_input}"})
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=messages
@@ -114,53 +64,23 @@ def get_response(user_input):
 def turn_off_lights():
     for pin in RELAY_GPIO_PINS:
         lgpio.gpio_write(h, pin, 0)
-        button_status = 0
     # print("Lights turned OFF")
 
-# Function to update the intake log when the button is pressed
-def update_intake_log():
-    try:
-        # Connect to your Azure PostgreSQL database
-        conn = psycopg2.connect(
-            dbname=dbname,
-            user=user,
-            password=password,
-            host=host,
-            port=port
-        )
-        
-        # Create a cursor object
-        cursor = conn.cursor()
-
-        # Fetch the pillcase ID of the medicine currently being taken
-        cursor.execute("SELECT id FROM pillcase WHERE %s = ANY(scheduletimes::date[])", (datetime.now().date(),))
-        pillcase_ids = cursor.fetchall()
-
-        # Update the intake log for all pillcases scheduled for today
-        for pillcase_id, in pillcase_ids:
-            cursor.execute("UPDATE intakelog SET intaketime = NOW(), isintaked = True WHERE pillcaseid = %s", (pillcase_id,))
-        
-        # Commit the transaction
-        conn.commit()
-        
-        print("Intake log updated successfully.")
-        
-    except (Exception, psycopg2.Error) as error:
-        print("Error updating intake log in PostgreSQL:", error)
-        conn.rollback()
-    finally:
-        # Close the database connection
-        if conn:
-            cursor.close()
-            conn.close()
+# Function to remind intake
+def remind_to_take_pills(schedule):
+    for entry in schedule:
+        pillcase_id = entry['pillcaseId']
+        schedule_time = entry['scheduleTime']
+        pill_info = get_pillcase_info(pillcase_id)
+        if pill_info and str(datetime.now().time().strftime('%H:%M')) in schedule_time:
+            pill_name, doses, case_no = pill_info
+            reminder_message = f"Please take {doses} dose(s) from pillbox {case_no}"
+            print(reminder_message)
+            engine.say("Time to take your medicines!")
 
 # Main loop
 while listening:
     try:
-        # Update humidity and temperature in the User table every 60 seconds
-        # humidity, temperature_celsius = read_bme280_sensor()
-        # update_humidity_temperature(humidity, temperature_celsius)
-
         with sr.Microphone() as source:
             recognizer = sr.Recognizer()
             recognizer.adjust_for_ambient_noise(source)
@@ -180,17 +100,21 @@ while listening:
                 engine.runAndWait()
 
             elif "last time I took my medicine" in response.lower():
-                medication_response = generate_medication_response()
-                engine.say(medication_response)
+                response_from_openai = get_response(response)
+                engine.say(response_from_openai)
                 engine.runAndWait()
 
             elif "next intake due" in response.lower():
-                medication_response = generate_medication_response()
-                engine.say(medication_response)
+                response_from_openai = get_response(response)
+                engine.say(response_from_openai)
                 engine.runAndWait()
 
-            elif "take my medicine" in response.lower():
+            elif "done" in response.lower():
                 update_intake_log()
+                turn_off_lights()
+                engine.say("Well done!")
+                # Refresh the daily schedule after updating the log
+                daily_schedule = fetch_daily_intake_schedule()
 
     except sr.WaitTimeoutError:
         print("No command detected.")

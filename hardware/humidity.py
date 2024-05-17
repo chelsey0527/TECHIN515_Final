@@ -4,6 +4,8 @@ import bme280
 import os
 import psycopg2
 from dotenv import load_dotenv
+import signal
+import sys
 
 load_dotenv()
 
@@ -50,6 +52,7 @@ def read_bme280_sensor(address=0x76, bus_number=1):
                 
     except Exception as e:
         print('An unexpected error occurred:', str(e))
+        return None, None
     finally:
         bus.close()
 
@@ -99,5 +102,15 @@ def update_humidity_temperature():
             cursor.close()
             conn.close()
 
-read_bme280_sensor()
-update_humidity_temperature()
+def signal_handler(sig, frame):
+    print('Exiting gracefully')
+    sys.exit(0)
+
+# Register the signal handler
+signal.signal(signal.SIGINT, signal_handler)
+signal.signal(signal.SIGTERM, signal_handler)
+
+if __name__ == "__main__":
+    while True:
+        update_humidity_temperature()
+        time.sleep(300)  # Wait for 5 minutes before the next update

@@ -1,4 +1,8 @@
-#!/bin/bash
+"""
+To run this file, please:
+chmod +x dependencies.sh
+./dependencies.sh
+"""
 
 # Install system packages
 sudo apt install python3-dotenv portaudio19-dev python3-pyaudio flac python3-espeak espeak
