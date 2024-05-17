@@ -6,8 +6,8 @@ import pyttsx3
 import openai
 from datetime import datetime, time
 from dotenv import load_dotenv
-from humidity import read_bme280_sensor, update_humidity_temperature
-from intake import fetch_daily_intake_schedule, get_pillcase_info, update_intake_log
+from humidity import update_humidity_temperature
+from intake import fetch_daily_intake_schedule, update_intake_log
 
 load_dotenv()
 
@@ -23,15 +23,10 @@ listening = True
 engine = pyttsx3.init()
 
 # Define the GPIO pin numbers
-RELAY_GPIO_PINS = [17]  # GPIO pins for light
 BUTTON_GPIO_PIN = 23  # GPIO pin for the intake completion button
 
 # Initialize the GPIO
 h = lgpio.gpiochip_open(4)
-
-# Set up GPIO pins as outputs for the lights
-for pin in RELAY_GPIO_PINS:
-    lgpio.gpio_claim_output(h, pin)
 
 # Set up GPIO pin as input for the button
 lgpio.gpio_claim_input(h, BUTTON_GPIO_PIN)
@@ -41,7 +36,7 @@ daily_schedule = fetch_daily_intake_schedule()
 
 # Set your OpenAI API key and customize the ChatGPT role
 openai.api_key = os.getenv("OPENAI_API_KEY")
-messages = [{"role": "system", "content": f"Your name is Tom and give answers in 2 lines. This is the intake schedule for today: {daily_schedule}. Answer based on this schedule."}]
+messages = [{"role": "system", "content": f"You are a nurse and your name is Tom. This is the intake schedule of your patient for today: {daily_schedule}. Use the provided schedule to answer questions."}]
 
 # Customizing the output voice
 voices = engine.getProperty('voices')
@@ -50,8 +45,8 @@ volume = engine.getProperty('volume')
 
 # Function to get response from OpenAI ChatGPT
 def get_response(user_input):
-    current_time = str(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-    messages.append({"role": "user", "content": f"It's {current_time}. This is my intake log: {daily_schedule}. {user_input}"})
+    current_time_full = str(datetime.now().strftime('%Y-%m-%d %H:%M'))
+    messages.append({"role": "user", "content": f"It's {current_time_full}. {user_input}"})
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=messages
@@ -60,29 +55,15 @@ def get_response(user_input):
     messages.append({"role": "assistant", "content": ChatGPT_reply})
     return ChatGPT_reply
 
-# Function to turn on the lights
-def turn_on_lights():
-    for pin in RELAY_GPIO_PINS:
-        lgpio.gpio_write(h, pin, 1)
-    # print("Lights turned ON")
-
-# Function to turn off the lights
-def turn_off_lights():
-    for pin in RELAY_GPIO_PINS:
-        lgpio.gpio_write(h, pin, 0)
-    # print("Lights turned OFF")
-
 # Function to remind intake
 def remind_to_take_pills(schedule):
     current_time = datetime.now().strftime('%H:%M')
     for entry in schedule:
-        pillcase_id = entry['pillcaseId']
         schedule_time = entry['scheduleTime']
-        pill_info = get_pillcase_info(pillcase_id)
-        if pill_info and current_time in schedule_time:
-            doses, case_no = pill_info
+        doses = entry['doses']
+        case_no = entry['caseNo']
+        if current_time in schedule_time:
             reminder_message = f"Please take {doses} dose(s) from pillbox {case_no}"
-            turn_on_lights()
             print(reminder_message)
             engine.say(reminder_message)
             engine.runAndWait()
@@ -120,11 +101,12 @@ while listening:
 
             elif "done" in response.lower():
                 update_intake_log()
-                turn_off_lights()
                 engine.say("Well done!")
                 # Refresh the daily schedule after updating the log
                 daily_schedule = fetch_daily_intake_schedule()
         
+        # Update humidity and temperature
+        update_humidity_temperature()
         # Check and remind for pill intake periodically (every minute)
         remind_to_take_pills(daily_schedule)
         time.sleep(60)
