@@ -1,5 +1,5 @@
 """
-To run this file, please:
+To run this file, please execute the following commands in terminal:
 chmod +x dependencies.sh
 ./dependencies.sh
 """
