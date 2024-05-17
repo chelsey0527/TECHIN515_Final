@@ -39,7 +39,7 @@ try:
     cur.execute('SELECT table_name FROM information_schema.tables WHERE table_schema = \'public\'')
     tables = cur.fetchall()
 
-    # Display the entire Pillcase table
+    # Display all tables
     for table in tables:
         table_name = table[0]
         print(f"\nTable: {table_name}")
