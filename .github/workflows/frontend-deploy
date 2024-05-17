@@ -8,29 +8,13 @@ on:
       - "frontend/**"
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Source
-        uses: actions/checkout@v3
-
-      - name: Setup Node.js version
-        uses: actions/setup-node@v4
-        with:
-          node-version: "18.x"
-
-      - name: Change to Frontend Directory
-        run: cd frontend
-
-      - name: Install Dependencies
+      - uses: actions/checkout@v2
+      - name: Install dependencies
         run: npm install
-
-      - name: Build Project
+      - name: Build
         run: npm run build
-
-      - name: Deploy to Azure App Service
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: techin515-frontend # Adjust the app-name if needed
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_FRONTEND }} # Ensure you have a separate publish profile if deploying to a different app
-          package: build/ # Adjust based on your build output directory
+        env:
+          VITE_BASE_URL: ${{ secrets.PRODUCTION_BASE_URL }}

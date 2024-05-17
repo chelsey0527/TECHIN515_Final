@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 import PillboxCard from "../components/PillboxCard";
 import StorageEnvCard from "../components/StorageEnvCard";
 
-const BASE_URL = "http://localhost:8080";
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 export default function Dashboard() {
+  console.log(import.meta.env);
+  console.log(BASE_URL);
   const [isLoading, setIsLoading] = useState(false);
   const [homeData, setHomeData] = useState({});
 
@@ -30,9 +32,42 @@ export default function Dashboard() {
   useEffect(() => {
     if (homeData.data) {
       // Ensuring data is there before logging
-      console.log("homeData has been updated:", homeData.data);
+      // console.log("homeData has been updated:", homeData.data);
     }
   }, [homeData.data]); // Listening specifically to homeData.data
+
+  // WebSocket connection
+  useEffect(() => {
+    const ws = new WebSocket("ws://localhost:8080");
+
+    ws.onopen = () => {
+      console.log("WebSocket Connected");
+    };
+
+    ws.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      setHomeData((prevData) => ({
+        ...prevData,
+        data: {
+          ...prevData.data,
+          pillboxHumidity: message.humidity,
+          pillboxTemperature: message.temperature,
+        },
+      }));
+    };
+
+    ws.onerror = (error) => {
+      console.error("WebSocket Error:", error);
+    };
+
+    ws.onclose = () => {
+      console.log("WebSocket Disconnected");
+    };
+
+    return () => {
+      ws.close();
+    };
+  }, []);
 
   if (isLoading) {
     return <div className=" h-screen w-full bg-gray-100 ">Loading...</div>;
@@ -62,7 +97,7 @@ export default function Dashboard() {
         </div>
       </section>
 
-      {/* Device */}
+      {/* Storage Environment */}
       <h1 className="font-bold font-heading container mx-auto px-10 pt-8 text-4xl">
         Storage Environment
       </h1>
@@ -73,7 +108,7 @@ export default function Dashboard() {
               props={{
                 ...homeData.data,
                 pillboxHumidity: homeData.data?.pillboxHumidity ?? "NaN",
-                pillboxTemperature: homeData.data?.pillboxTemperature ?? "Nan",
+                pillboxTemperature: homeData.data?.pillboxTemperature ?? "NaN",
               }}
             />
           </div>

@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import IntakeHistoryTable from "../components/IntakeHistoryTable";
 
-const BASE_URL = "http://localhost:8080";
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 export default function IntakeHistory() {
   const [isLoading, setIsLoading] = useState(false);
