@@ -10,7 +10,7 @@ import PillboxEdit from "./pages/PillboxEdit";
 function App() {
   return (
     <BrowserRouter>
-      <main className="h-screen w-full flex">
+      <main className="h-full w-full flex">
         <NavigationBar />
         <Routes>
           <Route path="/" element={<Dashboard />} />

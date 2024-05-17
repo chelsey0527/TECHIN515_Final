@@ -44,7 +44,7 @@ export class WebSocketService {
         } catch (error) {
           console.error("Error fetching data:", error);
         }
-      }, 5000); // Adjust the interval as needed
+      }, 2000); // Adjust the interval as needed
 
       ws.on("close", () => {
         clearInterval(interval);

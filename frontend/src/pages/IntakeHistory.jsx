@@ -46,11 +46,11 @@ export default function IntakeHistory() {
   }, [fetchIntakeLogs, hasMore]);
 
   if (isLoading && page === 1) {
-    return <div className="h-screen w-full bg-gray-100">Loading...</div>;
+    return <div className="h-screen w-full bg-sky-50">Loading...</div>;
   }
 
   return (
-    <div className="h-screen w-full bg-gray-100 ">
+    <div className="h-full w-full bg-sky-50 ">
       <div className="py-8 px-6">
         <div className="container px-4 mx-auto">
           <h2 className="font-bold text-4xl">Intake History</h2>

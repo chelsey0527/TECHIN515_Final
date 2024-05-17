@@ -5,8 +5,8 @@ import StorageEnvCard from "../components/StorageEnvCard";
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 export default function Dashboard() {
-  console.log(import.meta.env);
-  console.log(BASE_URL);
+  // console.log(import.meta.env);
+  // console.log(BASE_URL);
   const [isLoading, setIsLoading] = useState(false);
   const [homeData, setHomeData] = useState({});
 
@@ -70,11 +70,11 @@ export default function Dashboard() {
   }, []);
 
   if (isLoading) {
-    return <div className=" h-screen w-full bg-gray-100 ">Loading...</div>;
+    return <div className=" h-full w-full bg-sky-50 ">Loading...</div>;
   }
 
   return (
-    <div className=" h-screen w-full bg-gray-100 ">
+    <div className=" h-full w-full bg-sky-50 ">
       <div className="px-6 pb-4 pt-10">
         <div className="container px-4 mx-auto">
           <h2 className="text-2xl font-bold">

@@ -75,7 +75,7 @@ export default function PillboxEdit() {
   console.log(pillName, boxNo, scheduleTimes);
 
   return (
-    <div className=" h-screen w-full bg-gray-100 ">
+    <div className=" h-full w-full bg-sky-50 ">
       <div className="px-6 pb-4 pt-10">
         <div className="container px-4 mx-auto">
           <h2 className="text-2xl font-bold">Medication Information</h2>
