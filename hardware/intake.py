@@ -58,10 +58,9 @@ def fetch_daily_intake_schedule():
 
             date = str(datetime.now().date())
             query = '''
-            SELECT il."intakeTime", il."isIntaked", il."scheduleTime", il."scheduleDate", il."status", p."pillName", p."caseNo", p."doses"
-            FROM "IntakeLog" il
-            JOIN "Pillcase" p ON il."pillcaseId" = p.id
-            WHERE il."scheduleDate" = %s
+            SELECT "intakeTime", "isIntaked", "scheduleTime", "scheduleDate", "status", "pillName", "caseNo", "doses"
+            FROM "IntakeLog"
+            WHERE "scheduleDate" = %s
             '''
             cursor.execute(query, (date,))
             

@@ -1,3 +1,8 @@
+"""
+To run this file, please run:
+python main.py 2>/dev/null
+"""
+
 import os
 import psycopg2
 import lgpio
