@@ -1,7 +1,6 @@
 import os
 import psycopg2
 from dotenv import load_dotenv, find_dotenv
-import datetime
 
 # Load environment variables from .env file
 load_dotenv(find_dotenv())
