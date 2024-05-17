@@ -4,8 +4,7 @@ import bme280
 import os
 import psycopg2
 from dotenv import load_dotenv
-import signal
-import sys
+from azure import connect_to_database
 
 load_dotenv()
 
@@ -64,13 +63,7 @@ def update_humidity_temperature():
 
         if humidity is not None and temperature_celsius is not None:
             # Connect to your Azure PostgreSQL database
-            conn = psycopg2.connect(
-                dbname=dbname,
-                user=user,
-                password=password,
-                host=host,
-                port=port
-            )
+            conn = connect_to_database()
             
             # Create a cursor object
             cursor = conn.cursor()
@@ -102,15 +95,6 @@ def update_humidity_temperature():
             cursor.close()
             conn.close()
 
-def signal_handler(sig, frame):
-    print('Exiting gracefully')
-    sys.exit(0)
-
-# Register the signal handler
-signal.signal(signal.SIGINT, signal_handler)
-signal.signal(signal.SIGTERM, signal_handler)
-
-if __name__ == "__main__":
-    while True:
+while True:
         update_humidity_temperature()
         time.sleep(600)  # Wait for 10 minutes before the next update
