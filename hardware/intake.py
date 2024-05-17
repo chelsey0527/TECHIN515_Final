@@ -1,7 +1,6 @@
 import os
-import psycopg2
-from dotenv import load_dotenv, find_dotenv
 from datetime import datetime
+from dotenv import load_dotenv, find_dotenv
 from azure import connect_to_database
 
 # Load environment variables from .env file
@@ -15,64 +14,81 @@ host = os.getenv("HOST")
 port = os.getenv("PORT")
 
 def fetch_daily_intake_schedule():
-    conn = None
     try:
-        conn = connect_to_database()
-        cursor = conn.cursor()
+        with connect_to_database() as conn:
+            cursor = conn.cursor()
 
-        date = str(datetime.now().date())
-        query = 'SELECT "pillcaseId", "intakeTime", "isIntaked", "updatedAt", "userId", "scheduleTime", "scheduleDate", "status" FROM "IntakeLog" WHERE "scheduleDate" = %s'
-        cursor.execute(query, (date,))
-        
-        columns = [desc[0] for desc in cursor.description]
-        rows = cursor.fetchall()
-        schedule = [dict(zip(columns, row)) for row in rows]
+            date = str(datetime.now().date())
+            query = '''
+            SELECT il."intakeTime", il."isIntaked", il."scheduleTime", il."scheduleDate", il."status", p."pillName", p."caseNo", p."doses"
+            FROM "IntakeLog" il
+            JOIN "Pillcase" p ON il."pillcaseId" = p.id
+            WHERE il."scheduleDate" = %s
+            '''
+            cursor.execute(query, (date,))
+            
+            columns = [desc[0] for desc in cursor.description if desc[0] != "pillcaseId"]
+            rows = cursor.fetchall()
+            schedule = [dict(zip(columns, row)) for row in rows]
 
-        return schedule
+            return schedule
 
-    except (Exception, psycopg2.Error) as error:
+    except Exception as error:
         print("Error fetching daily intake schedule:", error)
-    finally:
-        if conn:
-            cursor.close()
-            conn.close()
 
-def get_pillcase_info(pillcase_id):
-    conn = None
+import os
+from datetime import datetime
+from dotenv import load_dotenv, find_dotenv
+from azure import connect_to_database
+
+# Load environment variables from .env file
+load_dotenv(find_dotenv())
+
+# Database connection information
+dbname = os.getenv("DATABASE")
+user = "chelsey"
+password = os.getenv("PASSWORD")
+host = os.getenv("HOST")
+port = os.getenv("PORT")
+
+def fetch_daily_intake_schedule():
     try:
-        conn = connect_to_database()
-        cursor = conn.cursor()
+        with connect_to_database() as conn:
+            cursor = conn.cursor()
 
-        query = 'SELECT "pillName", "doses", "caseNo" FROM "Pillcase" WHERE id = %s'
-        cursor.execute(query, (pillcase_id,))
-        pill_info = cursor.fetchone()
+            date = str(datetime.now().date())
+            query = '''
+            SELECT il."intakeTime", il."isIntaked", il."scheduleTime", il."scheduleDate", il."status", p."pillName", p."caseNo", p."doses"
+            FROM "IntakeLog" il
+            JOIN "Pillcase" p ON il."pillcaseId" = p.id
+            WHERE il."scheduleDate" = %s
+            '''
+            cursor.execute(query, (date,))
+            
+            columns = [desc[0] for desc in cursor.description if desc[0] != "pillcaseId"]
+            rows = cursor.fetchall()
+            schedule = [dict(zip(columns, row)) for row in rows]
 
-        return pill_info
+            return schedule
 
-    except (Exception, psycopg2.Error) as error:
-        print("Error fetching pillcase info:", error)
-    finally:
-        if conn:
-            cursor.close()
-            conn.close()
+    except Exception as error:
+        print("Error fetching daily intake schedule:", error)
 
 def update_intake_log(pillcase_id):
-    conn = None
-    intake_time = str(datetime.now().time().strftime('%H:%M'))
+    intake_time = str(datetime.now().time().strftime('%H'))
     try:
-        conn = connect_to_database()
-        cursor = conn.cursor()
+        with connect_to_database() as conn:
+            cursor = conn.cursor()
 
-        query = 'UPDATE "IntakeLog" SET "intakeTime" = %s, "isIntaked" = True, "status" = %s WHERE "pillcaseId" = %s AND %s in "scheduleTime"'
-        cursor.execute(query, (intake_time, 'Completed', pillcase_id, intake_time))
+            query = '''
+            UPDATE "IntakeLog" 
+            SET "intakeTime" = %s, "isIntaked" = True, "status" = %s 
+            WHERE "pillcaseId" = %s AND %s = ANY("scheduleTime")
+            '''
+            cursor.execute(query, (intake_time, 'Completed', pillcase_id, intake_time))
 
-        conn.commit()
+            conn.commit()
 
-    except (Exception, psycopg2.Error) as error:
+    except Exception as error:
         print("Error updating intake log:", error)
-        if conn:
-            conn.rollback()
-    finally:
-        if conn:
-            cursor.close()
-            conn.close()
+        conn.rollback()
