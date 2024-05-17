@@ -36,7 +36,7 @@ daily_schedule = fetch_daily_intake_schedule()
 
 # Set your OpenAI API key and customize the ChatGPT role
 openai.api_key = os.getenv("OPENAI_API_KEY")
-messages = [{"role": "system", "content": f"You are a nurse and your name is Tom. This is the intake schedule of your patient for today: {daily_schedule}. Use the provided schedule to answer questions."}]
+messages = [{"role": "system", "content": f"You are a assistant named Tom. This is the intake schedule of your patient for today: {daily_schedule}. Use the provided schedule to answer questions. Keep your answers concise and informative."}]
 
 # Customizing the output voice
 voices = engine.getProperty('voices')
@@ -95,7 +95,7 @@ while listening:
                 engine.runAndWait()
 
             elif "next intake due" in response.lower():
-                response_from_openai = get_response(response)
+                response_from_openai = get_response(f"{response}? List out all the upcoming intakes.")
                 engine.say(response_from_openai)
                 engine.runAndWait()
 

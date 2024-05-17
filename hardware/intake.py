@@ -83,9 +83,9 @@ def update_intake_log(pillcase_id):
             query = '''
             UPDATE "IntakeLog" 
             SET "intakeTime" = %s, "isIntaked" = True, "status" = %s 
-            WHERE "pillcaseId" = %s AND %s = ANY("scheduleTime")
+            WHERE "pillcaseId" = %s AND "status" = %s AND %s = ANY("scheduleTime")
             '''
-            cursor.execute(query, (intake_time, 'Completed', pillcase_id, intake_time))
+            cursor.execute(query, (intake_time, 'Completed', pillcase_id, 'Pending',intake_time))
 
             conn.commit()
 
