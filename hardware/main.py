@@ -4,7 +4,7 @@ import lgpio
 import speech_recognition as sr
 import pyttsx3
 import openai
-from datetime import datetime, timedelta
+from datetime import datetime, time
 from dotenv import load_dotenv
 from humidity import read_bme280_sensor, update_humidity_temperature
 from intake import fetch_daily_intake_schedule, get_pillcase_info, update_intake_log
@@ -38,7 +38,6 @@ lgpio.gpio_claim_input(h, BUTTON_GPIO_PIN)
 
 # Fetch daily intake schedule and store it
 daily_schedule = fetch_daily_intake_schedule()
-current_time = str(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 
 # Set your OpenAI API key and customize the ChatGPT role
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -51,6 +50,7 @@ volume = engine.getProperty('volume')
 
 # Function to get response from OpenAI ChatGPT
 def get_response(user_input):
+    current_time = str(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
     messages.append({"role": "user", "content": f"It's {current_time}. This is my intake log: {daily_schedule}. {user_input}"})
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
@@ -60,6 +60,12 @@ def get_response(user_input):
     messages.append({"role": "assistant", "content": ChatGPT_reply})
     return ChatGPT_reply
 
+# Function to turn on the lights
+def turn_on_lights():
+    for pin in RELAY_GPIO_PINS:
+        lgpio.gpio_write(h, pin, 1)
+    # print("Lights turned ON")
+
 # Function to turn off the lights
 def turn_off_lights():
     for pin in RELAY_GPIO_PINS:
@@ -68,15 +74,18 @@ def turn_off_lights():
 
 # Function to remind intake
 def remind_to_take_pills(schedule):
+    current_time = datetime.now().strftime('%H:%M')
     for entry in schedule:
         pillcase_id = entry['pillcaseId']
         schedule_time = entry['scheduleTime']
         pill_info = get_pillcase_info(pillcase_id)
-        if pill_info and str(datetime.now().time().strftime('%H:%M')) in schedule_time:
-            pill_name, doses, case_no = pill_info
+        if pill_info and current_time in schedule_time:
+            doses, case_no = pill_info
             reminder_message = f"Please take {doses} dose(s) from pillbox {case_no}"
+            turn_on_lights()
             print(reminder_message)
-            engine.say("Time to take your medicines!")
+            engine.say(reminder_message)
+            engine.runAndWait()
 
 # Main loop
 while listening:
@@ -115,6 +124,10 @@ while listening:
                 engine.say("Well done!")
                 # Refresh the daily schedule after updating the log
                 daily_schedule = fetch_daily_intake_schedule()
+        
+        # Check and remind for pill intake periodically (every minute)
+        remind_to_take_pills(daily_schedule)
+        time.sleep(60)
 
     except sr.WaitTimeoutError:
         print("No command detected.")
