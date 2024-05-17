@@ -113,4 +113,4 @@ signal.signal(signal.SIGTERM, signal_handler)
 if __name__ == "__main__":
     while True:
         update_humidity_temperature()
-        time.sleep(300)  # Wait for 5 minutes before the next update
+        time.sleep(600)  # Wait for 10 minutes before the next update
