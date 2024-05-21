@@ -20,11 +20,21 @@ jobs:
         with:
           node-version: "18.x"
 
-      - name: npm install, build, and test
-        run: |
-          cd backend
-          npm install
-          npm run build --if-present
+      - name: Install dependencies
+        run: npm install
+        working-directory: backend
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+        working-directory: backend
+
+      - name: Apply database migrations
+        run: npx prisma migrate deploy
+        working-directory: backend
+
+      - name: Build the project
+        run: npm run build --if-present
+        working-directory: backend
 
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v3

@@ -1,5 +1,8 @@
 // Change from 24-hr-clock to 12-hr-clock
 export const convertTo12HourFormat = (time24) => {
+  if (!time24) {
+    console.error("No time was sent into convertTo12HourFormat.");
+  }
   // Filter format
   time24 = time24.replace(/'/g, "").split(":").slice(0, 2).join(":");
   let [hours, minutes] = time24.split(":");
