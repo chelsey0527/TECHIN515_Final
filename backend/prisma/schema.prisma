@@ -33,15 +33,16 @@ model Pillcase {
   scheduleTimes String[]
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
-  IntakeLog     IntakeLog[]
   caseNo        Int
 }
 
 model IntakeLog {
   id           String    @id @default(uuid())
-  pillcaseId   String
   userId       String
-  pillcase     Pillcase  @relation(fields: [pillcaseId], references: [id])
+  pillcaseId   String
+  caseNo       Int
+  pillName     String
+  doses        Int
   intakeTime   DateTime? // The actual time the medication was taken
   isIntaked    Boolean   @default(false) // Whether the dose was taken
   scheduleDate String? // The date of the scheduled intake
@@ -49,7 +50,4 @@ model IntakeLog {
   status       String?    @default("Pending")
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
-  caseNo       Int?
-  pillName     String?
-  doses        Int?
 }

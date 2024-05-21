@@ -32,54 +32,39 @@ export const getIntakelogData = async (
     const limit = parseInt(req.query.limit as string) || 10;
     const skip = (page - 1) * limit;
 
-    const pillcases = await prisma.pillcase.findMany({
+    const intakeLogs = await prisma.intakeLog.findMany({
       where: {
         userId: userId,
+      },
+      orderBy: {
+        scheduleTime: "desc", // Sorting by scheduleTime descending
       },
       select: {
         id: true,
         caseNo: true, // Make sure to fetch the caseNo here for sorting
-        IntakeLog: {
-          orderBy: {
-            scheduleTime: "desc", // Sorting by scheduleTime descending
-          },
-          select: {
-            id: true,
-            pillName: true,
-            doses: true,
-            scheduleTime: true,
-            scheduleDate: true,
-            intakeTime: true,
-            isIntaked: true,
-            status: true,
-          },
-        },
+        pillName: true,
+        doses: true,
+        scheduleTime: true,
+        scheduleDate: true,
+        intakeTime: true,
+        isIntaked: true,
+        status: true,
       },
     });
 
-    // Flatten the data structure to have each IntakeLog entry separate along with its associated Pillcase data
-    const flatIntakeLogs = pillcases.flatMap((pillcase) =>
-      pillcase.IntakeLog.map((log) => ({
-        pillcaseId: pillcase.id,
-        scheduleDate: log.scheduleDate,
-        scheduleTime: log.scheduleTime.replace(/'/g, ""), // Formatting time
-        intakeTime: log.intakeTime,
-        isIntaked: log.isIntaked,
-        status: log.status,
-        pillName: log.pillName,
-        caseNo: pillcase.caseNo, // Using caseNo from pillcase
-        doses: log.doses,
-      }))
-    );
+    // Format scheduleTime
+    intakeLogs.forEach((log) => {
+      log.scheduleTime = log.scheduleTime.replace(/'/g, "");
+    });
 
-    // First, sort by scheduleDate in descending order
-    flatIntakeLogs.sort(
+    // Sort by scheduleDate in descending order
+    intakeLogs.sort(
       (a, b) =>
         new Date(b.scheduleDate).getTime() - new Date(a.scheduleDate).getTime()
     );
 
     // Then, sort by caseNo in ascending order where scheduleDate is the same
-    flatIntakeLogs.sort((a, b) => {
+    intakeLogs.sort((a, b) => {
       if (a.scheduleDate === b.scheduleDate) {
         return a.caseNo - b.caseNo; // Ensure caseNo is a number
       }
@@ -87,7 +72,7 @@ export const getIntakelogData = async (
     });
 
     // Paginate the sorted results
-    const paginatedIntakeLogs = flatIntakeLogs.slice(skip, skip + limit);
+    const paginatedIntakeLogs = intakeLogs.slice(skip, skip + limit);
 
     if (paginatedIntakeLogs.length > 0) {
       res.status(200).json({ data: paginatedIntakeLogs });

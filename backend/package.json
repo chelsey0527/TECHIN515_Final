@@ -8,6 +8,7 @@
     "start": "tsc && node dist/index.js",
     "build": "prisma generate && tsc -p tsconfig.json",
     "migrate": "prisma migrate deploy",
+    "migrate-dev": "prisma migrate dev",
     "generate": "prisma generate"
   },
   "dependencies": {
