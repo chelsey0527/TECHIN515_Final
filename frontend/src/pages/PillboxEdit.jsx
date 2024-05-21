@@ -2,7 +2,9 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { convertTo24HourFormat } from "../utils/timeUtils";
 
-const BASE_URL = import.meta.env.VITE_BASE_URL;
+// const BASE_URL = import.meta.env.VITE_BASE_URL;
+// const BASE_URL = "https://techin515.azurewebsites.net";
+const BASE_URL = "http://localhost:8080";
 
 export default function PillboxEdit() {
   const { boxId } = useParams();

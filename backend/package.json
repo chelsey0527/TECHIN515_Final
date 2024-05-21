@@ -11,7 +11,7 @@
     "generate": "prisma generate"
   },
   "dependencies": {
-    "@prisma/client": "^5.13.0",
+    "@prisma/client": "^5.14.0",
     "axios": "^1.6.8",
     "cors": "^2.8.5",
     "express": "^4.19.2",
