@@ -41,7 +41,19 @@ daily_schedule = fetch_daily_intake_schedule()
 
 # Set your OpenAI API key and customize the ChatGPT role
 openai.api_key = os.getenv("OPENAI_API_KEY")
-messages = [{"role": "system", "content": f"You are a assistant named Tom. This is the intake schedule of your patient for today: {daily_schedule}. Use the provided schedule to answer questions. Keep your answers concise and informative."}]
+
+def classify_intent(user_input):
+    intent_messages = [
+        {"role": "system", "content": "You are Tom, an assistant that classifies the intent of user queries about a medication schedule. The categories are: 'last_intake', 'next_intake', 'list_all', or 'unknown'."},
+        {"role": "user", "content": user_input}
+    ]
+
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=intent_messages
+    )
+    intent = response["choices"][0]["message"]["content"].strip().lower()
+    return intent
 
 # Customizing the output voice
 voices = engine.getProperty('voices')
@@ -49,16 +61,43 @@ rate = engine.getProperty('rate')
 volume = engine.getProperty('volume')
 
 # Function to get response from OpenAI ChatGPT
-def get_response(user_input):
-    current_time_full = str(datetime.now().strftime('%Y-%m-%d %H:%M'))
-    messages.append({"role": "user", "content": f"It's {current_time_full}. {user_input}"})
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=messages
-    )
-    ChatGPT_reply = response["choices"][0]["message"]["content"]
-    messages.append({"role": "assistant", "content": ChatGPT_reply})
-    return ChatGPT_reply
+def generate_response(intent, user_input, daily_schedule):
+    if intent == 'last_intake':
+        return get_last_intake(daily_schedule)
+    elif intent == 'next_intake':
+        return get_next_intake(daily_schedule)
+    elif intent == 'list_all':
+        return list_upcoming_intakes(daily_schedule)
+    else:
+        return "I'm sorry, I didn't understand that. Can you please rephrase?"
+
+def get_last_intake(schedule):
+    last_intake = None
+    for entry in schedule:
+        if entry['isIntaked']:
+            last_intake = entry
+    if last_intake:
+        return f"The last intake was {last_intake['pillName']} from pillbox {last_intake['caseNo']} at {last_intake['intakeTime']}."
+    return "You haven't taken any medication yet."
+
+def get_next_intake(schedule):
+    current_time = datetime.now()
+    for entry in schedule:
+        intake_time = datetime.strptime(entry['scheduleDate'] + ' ' + entry['scheduleTime'], '%Y-%m-%d %H:%M')
+        if intake_time > current_time:
+            return f"Your next intake is {entry['pillName']} from pillbox {entry['caseNo']} at {entry['scheduleTime']}."
+    return "No more intakes scheduled for today."
+
+def list_upcoming_intakes(schedule):
+    current_time = datetime.now()
+    upcoming_intakes = []
+    for entry in schedule:
+        intake_time = datetime.strptime(entry['scheduleDate'] + ' ' + entry['scheduleTime'], '%Y-%m-%d %H:%M')
+        if intake_time > current_time:
+            upcoming_intakes.append(entry)
+    if upcoming_intakes:
+        return "You have intakes for: " + ", ".join([f"{entry['pillName']} scheduled at {entry['scheduleTime']}" for entry in upcoming_intakes])
+    return "No more intakes scheduled for today."
 
 # Function to remind intake
 def remind_to_take_pills(schedule):
@@ -87,21 +126,12 @@ while listening:
             print(response)
 
             if "tom" in response.lower():
-                response_from_openai = get_response(response)
+                intent = classify_intent(response)
+                response_from_intent = generate_response(intent, response, daily_schedule)
                 engine.setProperty('rate', 120)
                 engine.setProperty('volume', volume)
                 engine.setProperty('voice', 'english-us')
-                engine.say(response_from_openai)
-                engine.runAndWait()
-
-            elif "last time I took my medicine" in response.lower():
-                response_from_openai = get_response(response)
-                engine.say(response_from_openai)
-                engine.runAndWait()
-
-            elif "next intake due" in response.lower():
-                response_from_openai = get_response(f"{response}? List out all the upcoming intakes.")
-                engine.say(response_from_openai)
+                engine.say(response_from_intent)
                 engine.runAndWait()
 
             elif "done" in response.lower():
