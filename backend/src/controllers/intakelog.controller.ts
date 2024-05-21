@@ -109,14 +109,14 @@ export const scheduleDailyIntakeLogs = async (user_id) => {
       pillcase.scheduleTimes.map((scheduleTime) => ({
         pillcaseId: pillcase.id,
         userId: userId,
+        pillName: pillcase.pillName,
+        caseNo: pillcase.caseNo,
+        doses: pillcase.doses,
         intakeTime: null,
         isIntaked: false,
         scheduleDate: date,
         scheduleTime: scheduleTime,
         status: "Pending",
-        pillName: pillcase.pillName,
-        caseNo: pillcase.caseNo,
-        doses: pillcase.doses,
       }))
     );
 

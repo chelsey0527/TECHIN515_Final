@@ -37,12 +37,24 @@ jobs:
         working-directory: backend
 
       - name: Build the project
-        run: npm run build --if-present
+        run: npm run build
         working-directory: backend
 
+      - name: Archive the build files
+        run: zip -r ../backend.zip *
+        working-directory: backend/dist
+
       - name: Deploy to Azure App Service
-        uses: azure/webapps-deploy@v3
+        uses: azure/webapps-deploy@v2
         with:
           app-name: techin515
+          package: backend.zip
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: backend/dist
+
+      - name: Restart Azure App Service
+        run: |
+          az webapp restart --name techin515 --resource-group your-resource-group
+        env:
+          AZURE_WEBAPP_NAME: techin515
+          AZURE_RESOURCE_GROUP: your-resource-group
+          AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
