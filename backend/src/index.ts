@@ -45,17 +45,17 @@ const webSocketService = new WebSocketService(server);
 //     });
 
 // TEST: Setting up the cron job to every minutes
-var testTask = cron.schedule(
-  "* * * * *",
-  () => {
-    console.log("Insert data into database");
-    scheduleDailyIntakeLogs("ee430f72-7def-434c-ade8-c464c04655b7");
-  },
-  {
-    scheduled: true,
-    timezone: "America/Los_Angeles",
-  }
-);
+// var testTask = cron.schedule(
+//   "* * * * *",
+//   () => {
+//     console.log("Insert data into database");
+//     scheduleDailyIntakeLogs("ee430f72-7def-434c-ade8-c464c04655b7");
+//   },
+//   {
+//     scheduled: true,
+//     timezone: "America/Los_Angeles",
+//   }
+// );
 
 server.listen(port, () => {
   console.log(`server running on ${port} !`);
