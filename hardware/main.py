@@ -61,7 +61,7 @@ rate = engine.getProperty('rate')
 volume = engine.getProperty('volume')
 
 # Function to get response from OpenAI ChatGPT
-def generate_response(intent, user_input, daily_schedule):
+def generate_response(intent, daily_schedule):
     if intent == 'last_intake':
         return get_last_intake(daily_schedule)
     elif intent == 'next_intake':
@@ -127,7 +127,7 @@ while listening:
 
             if "tom" in response.lower():
                 intent = classify_intent(response)
-                response_from_intent = generate_response(intent, response, daily_schedule)
+                response_from_intent = generate_response(intent, daily_schedule)
                 engine.setProperty('rate', 120)
                 engine.setProperty('volume', volume)
                 engine.setProperty('voice', 'english-us')
