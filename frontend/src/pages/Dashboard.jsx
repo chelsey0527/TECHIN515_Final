@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import PillboxCard from "../components/PillboxCard";
 import StorageEnvCard from "../components/StorageEnvCard";
 
-const BASE_URL = import.meta.env.VITE_BASE_URL;
+// const BASE_URL = import.meta.env.VITE_BASE_URL;
+// const BASE_URL = "https://techin515.azurewebsites.net";
+const BASE_URL = "http://localhost:8080";
 
 export default function Dashboard() {
   // console.log(import.meta.env);
