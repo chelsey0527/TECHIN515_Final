@@ -71,7 +71,7 @@ export const getIntakelogData = async (
       return 0;
     });
 
-    // Paginate the sorted results
+    // Pagination
     const paginatedIntakeLogs = intakeLogs.slice(skip, skip + limit);
 
     if (paginatedIntakeLogs.length > 0) {
