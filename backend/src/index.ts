@@ -9,7 +9,7 @@ import pillcaseRouter from "./routes/pillcase.router";
 import locationRouter from "./routes/environment.router";
 import intakelogRouter from "./routes/intakelog.router";
 import deviceRouter from "./routes/device.router";
-// import { scheduleDailyIntakeLogs } from "./controllers/intakelog.controller";
+import { scheduleDailyIntakeLogs } from "./controllers/intakelog.controller";
 import { WebSocketService } from "./services/websocket.service";
 
 const app = express();
