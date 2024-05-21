@@ -111,10 +111,10 @@ export const scheduleDailyIntakeLogs = async (user_id) => {
       },
       select: {
         id: true,
-        scheduleTimes: true,
-        pillName: true,
         caseNo: true,
+        pillName: true,
         doses: true,
+        scheduleTimes: true,
       },
     });
     console.log("Pillcases found:", JSON.stringify(pillcases, null, 2));
