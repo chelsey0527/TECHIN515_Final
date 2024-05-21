@@ -41,7 +41,7 @@ export const getIntakelogData = async (
       },
       select: {
         id: true,
-        caseNo: true, // Make sure to fetch the caseNo here for sorting
+        caseNo: true,
         pillName: true,
         doses: true,
         scheduleTime: true,
