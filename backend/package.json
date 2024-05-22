@@ -4,9 +4,9 @@
   "main": "dist/index.js",
   "license": "MIT",
   "scripts": {
-    "start": "tsc && node build/index.js",
+    "start": "tsc && node dist/index.js",
     "dev": "nodemon src/index.ts",
-    "build": "tsc",
+    "build": "tsc -p tsconfig.json",
     "migrate": "prisma migrate deploy",
     "generate": "prisma generate"
   },

@@ -28,21 +28,21 @@ jobs:
         run: npm run build
         working-directory: backend
 
-      - name: List files in dist
-        run: ls -al dist
-        working-directory: backend
+      # - name: List files in dist
+      #   run: ls -al dist
+      #   working-directory: backend
 
-      - name: Apply database migrations
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: npx prisma migrate deploy
-        working-directory: backend
+      # - name: Apply database migrations
+      #   env:
+      #     DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      #   run: npx prisma migrate deploy
+      #   working-directory: backend
 
-      - name: Generate Prisma client
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: npx prisma generate
-        working-directory: backend
+      # - name: Generate Prisma client
+      #   env:
+      #     DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      #   run: npx prisma generate
+      #   working-directory: backend
 
       - name: Deploy to Azure App Service
         uses: azure/webapps-deploy@v3
