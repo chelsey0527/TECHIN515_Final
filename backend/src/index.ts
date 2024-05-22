@@ -34,6 +34,10 @@ const server = http.createServer(app);
 // Initialize WebSocketService with the server
 const webSocketService = new WebSocketService(server);
 
+server.listen(port, () => {
+  console.log(`server running on ${port} !`);
+});
+
 // Setting up the cron job to run at midnight every day
 // var task = cron.schedule(
 //   "0 0 0 * * *",
@@ -59,7 +63,3 @@ const webSocketService = new WebSocketService(server);
 //     timezone: "America/Los_Angeles",
 //   }
 // );
-
-server.listen(port, () => {
-  console.log(`server running on ${port} !`);
-});
