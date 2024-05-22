@@ -20,17 +20,12 @@ jobs:
         with:
           node-version: "18.x"
 
-      - name: Install dependencies
-        run: npm install
-        working-directory: backend
-
-      - name: Install TypeScript globally
-        run: npm install -g typescript
-        working-directory: backend
-
-      - name: Build the project
-        run: npm run build
-        working-directory: backend
+      - name: npm install, build, and test
+        run: |
+          cd backend
+          npm install
+          npm install -g typescript
+          npm run build --if-present
 
       # - name: List files in dist
       #   run: ls -al dist
@@ -53,4 +48,4 @@ jobs:
         with:
           app-name: techin515
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: backend
+          package: dist/backend
