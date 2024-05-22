@@ -4,7 +4,7 @@
   "main": "dist/index.js",
   "license": "MIT",
   "scripts": {
-    "start": "node dist/index.js",
+    "start": "echo 'Checking tsc...' && tsc --version && echo 'Starting application...' && node dist/index.js",
     "dev": "nodemon src/index.ts",
     "build": "tsc -p tsconfig.json",
     "migrate": "prisma migrate deploy",
@@ -12,16 +12,15 @@
   },
   "dependencies": {
     "@prisma/client": "^5.14.0",
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.12.7",
     "axios": "^1.6.8",
     "cors": "^2.8.5",
     "express": "^4.19.2",
     "moment-timezone": "^0.5.45",
     "node-cron": "^3.0.3",
-    "ws": "^8.17.0",
-    "@types/express": "^4.17.21",
-    "@types/node": "^20.12.7",
     "ts-node": "^10.9.2",
-    "typescript": "^5.4.5"
+    "ws": "^8.17.0"
   },
   "devDependencies": {
     "@types/express": "^4.17.21",
