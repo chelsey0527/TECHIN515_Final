@@ -95,6 +95,6 @@ def update_humidity_temperature():
             cursor.close()
             conn.close()
 
-while True:
-        update_humidity_temperature()
-        time.sleep(600)  # Wait for 10 minutes before the next update
+# while True:
+#         update_humidity_temperature()
+#         time.sleep(600)  # Wait for 10 minutes before the next update
