@@ -23,6 +23,7 @@ def fetch_daily_intake_schedule():
             SELECT "intakeTime", "isIntaked", "scheduleTime", "scheduleDate", "status", "pillName", "caseNo", "doses"
             FROM "IntakeLog"
             WHERE "scheduleDate" = %s
+            ORDER BY CAST("scheduleTime" AS TIME)
             '''
             cursor.execute(query, (date,))
             
