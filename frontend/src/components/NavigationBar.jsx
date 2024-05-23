@@ -51,13 +51,13 @@ export default function NavigationBar() {
         animate={isExpanded ? "expanded" : "nonExpanded"}
         variants={variants}
         className={
-          " py-12 flex flex-col  w-1/5 h-full relative  lg:border-b border-blue-50" +
+          " py-12 flex flex-col  w-1/5 h-full relative  lg:border-b" +
           (isExpanded ? " px-5 " : " px-2 ")
         }
       >
         <Link
           to={`/`}
-          className="logo-div flex space-x-3 items-center font-bold border-b-2 pb-4 "
+          className="logo-div flex space-x-3 items-center font-bold border-b-[1px] border-blue-50 pb-4 "
         >
           <img className="w-10" src={logo} />
           <span

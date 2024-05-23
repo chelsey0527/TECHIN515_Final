@@ -42,8 +42,7 @@ export default function IntakeHistoryTable({ data }) {
               <td className="font-medium">{item.pillName}</td>
               <td className="font-medium">{item.scheduleDate}</td>
               <td className="font-medium">
-                {/* {convertTo12HourFormat(item.scheduleTime)} */}
-                123
+                {convertTo12HourFormat(item.scheduleTime)}
               </td>
               <td className="font-medium">{item.doses}</td>
               <td>

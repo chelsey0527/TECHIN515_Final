@@ -71,6 +71,22 @@ export const getIntakelogData = async (
       return 0;
     });
 
+    // Calculate and update the status in the database
+    const updates = intakeLogs.map((log) => {
+      const newStatus = calculateStatus(
+        log.isIntaked,
+        log.scheduleDate,
+        log.scheduleTime
+      );
+      return prisma.intakeLog.update({
+        where: { id: log.id },
+        data: { status: newStatus },
+      });
+    });
+
+    // Execute all updates as a transaction
+    await prisma.$transaction(updates);
+
     // Pagination
     const paginatedIntakeLogs = intakeLogs.slice(skip, skip + limit);
 
