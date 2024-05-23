@@ -5,7 +5,7 @@ python main.py 2>/dev/null
 
 import os
 import psycopg2
-import lgpio
+# import lgpio
 import speech_recognition as sr
 import pyttsx3
 import openai
@@ -30,10 +30,10 @@ engine = pyttsx3.init()
 # Define the GPIO pin numbers
 BUTTON_GPIO_PIN = 23  # GPIO pin for the intake completion button
 
-# Initialize the GPIO
+# # Initialize the GPIO
 h = lgpio.gpiochip_open(4)
 
-# Set up GPIO pin as input for the button
+# # Set up GPIO pin as input for the button
 lgpio.gpio_claim_input(h, BUTTON_GPIO_PIN)
 
 # Fetch daily intake schedule and store it
@@ -72,31 +72,48 @@ def generate_response(intent, daily_schedule):
         return "I'm sorry, I didn't understand that. Can you please rephrase?"
 
 def get_last_intake(schedule):
-    last_intake = None
-    for entry in schedule:
-        if entry['isIntaked']:
-            last_intake = entry
-    if last_intake:
+    last_intakes = [entry for entry in schedule if entry['isIntaked']]
+    if last_intakes:
+        last_intake = max(last_intakes, key=lambda x: datetime.strptime(x['scheduleDate'] + ' ' + x['scheduleTime'], '%Y-%m-%d %H:%M'))
         return f"The last intake was {last_intake['pillName']} from pillbox {last_intake['caseNo']} at {last_intake['intakeTime']}."
     return "You haven't taken any medication yet."
 
 def get_next_intake(schedule):
     current_time = datetime.now()
-    for entry in schedule:
-        intake_time = datetime.strptime(entry['scheduleDate'] + ' ' + entry['scheduleTime'], '%Y-%m-%d %H:%M')
-        if intake_time > current_time:
-            return f"Your next intake is {entry['pillName']} from pillbox {entry['caseNo']} at {entry['scheduleTime']}."
+    upcoming_intakes = [entry for entry in schedule if datetime.strptime(entry['scheduleDate'] + ' ' + entry['scheduleTime'], '%Y-%m-%d %H:%M') > current_time and not entry['isIntaked']]
+    if upcoming_intakes:
+        sorted_intakes = sorted(upcoming_intakes, key=lambda x: (datetime.strptime(x['scheduleDate'], '%Y-%m-%d'), datetime.strptime(x['scheduleTime'], '%H:%M')))
+        grouped_intakes = {}
+        for intake in sorted_intakes:
+            time_key = intake['scheduleTime']
+            if time_key not in grouped_intakes:
+                grouped_intakes[time_key] = []
+            grouped_intakes[time_key].append(intake['pillName'])
+
+        next_intakes = []
+        for time_key, pills in grouped_intakes.items():
+            pills_str = ', '.join(pills)
+            next_intakes.append(f"Your next intake is {pills_str} at {time_key} .")
+        return next_intakes[0]
     return "No more intakes scheduled for today."
 
 def list_upcoming_intakes(schedule):
     current_time = datetime.now()
-    upcoming_intakes = []
-    for entry in schedule:
-        intake_time = datetime.strptime(entry['scheduleDate'] + ' ' + entry['scheduleTime'], '%Y-%m-%d %H:%M')
-        if intake_time > current_time:
-            upcoming_intakes.append(entry)
+    upcoming_intakes = [entry for entry in schedule if datetime.strptime(entry['scheduleDate'] + ' ' + entry['scheduleTime'], '%Y-%m-%d %H:%M') > current_time and not entry['isIntaked']]
     if upcoming_intakes:
-        return "You have intakes for: " + ", ".join([f"{entry['pillName']} scheduled at {entry['scheduleTime']}" for entry in upcoming_intakes])
+        sorted_intakes = sorted(upcoming_intakes, key=lambda x: (datetime.strptime(x['scheduleDate'], '%Y-%m-%d'), datetime.strptime(x['scheduleTime'], '%H:%M')))
+        grouped_intakes = {}
+        for intake in sorted_intakes:
+            time_key = intake['scheduleTime']
+            if time_key not in grouped_intakes:
+                grouped_intakes[time_key] = []
+            grouped_intakes[time_key].append(intake['pillName'])
+
+        next_intakes = []
+        for time_key, pills in grouped_intakes.items():
+            pills_str = ', '.join(pills)
+            next_intakes.append(f"Your have {pills_str} at {time_key} .")
+        return "\n".join(next_intakes)
     return "No more intakes scheduled for today."
 
 # Function to remind intake
@@ -128,9 +145,9 @@ while listening:
             if "tom" in response.lower():
                 intent = classify_intent(response)
                 response_from_intent = generate_response(intent, daily_schedule)
-                engine.setProperty('rate', 120)
+                engine.setProperty('rate', 150)
                 engine.setProperty('volume', volume)
-                engine.setProperty('voice', 'english-us')
+                engine.setProperty('voice', 'english')
                 engine.say(response_from_intent)
                 engine.runAndWait()
 
