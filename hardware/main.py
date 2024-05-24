@@ -5,7 +5,7 @@ python main.py 2>/dev/null
 
 import os
 import psycopg2
-# import lgpio
+import lgpio
 import speech_recognition as sr
 import pyttsx3
 import openai
@@ -132,6 +132,11 @@ def remind_to_take_pills(schedule):
 # Main loop
 while listening:
     try:
+        # Update humidity and temperature
+        update_humidity_temperature()
+        # Check and remind for pill intake periodically (every minute)
+        remind_to_take_pills(daily_schedule)
+        
         with sr.Microphone() as source:
             recognizer = sr.Recognizer()
             recognizer.adjust_for_ambient_noise(source)
@@ -145,22 +150,18 @@ while listening:
             if "tom" in response.lower():
                 intent = classify_intent(response)
                 response_from_intent = generate_response(intent, daily_schedule)
-                engine.setProperty('rate', 150)
+                engine.setProperty('rate', 155)
                 engine.setProperty('volume', volume)
                 engine.setProperty('voice', 'english')
                 engine.say(response_from_intent)
                 engine.runAndWait()
 
-            elif "done" in response.lower():
+            elif "okay" in response.lower():
                 update_intake_log()
                 engine.say("Well done!")
                 # Refresh the daily schedule after updating the log
                 daily_schedule = fetch_daily_intake_schedule()
-        
-        # Update humidity and temperature
-        update_humidity_temperature()
-        # Check and remind for pill intake periodically (every minute)
-        remind_to_take_pills(daily_schedule)
+
         time.sleep(60)
 
     except sr.WaitTimeoutError:

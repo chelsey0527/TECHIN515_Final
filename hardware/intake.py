@@ -36,18 +36,21 @@ def fetch_daily_intake_schedule():
     except Exception as error:
         print("Error fetching daily intake schedule:", error)
 
-def update_intake_log(pillcase_id):
-    intake_time = str(datetime.now().time().strftime('%H'))
+def update_intake_log():
+    current_time = datetime.now()
+    current_hour = current_time.hour
+
     try:
         with connect_to_database() as conn:
             cursor = conn.cursor()
 
             query = '''
-            UPDATE "IntakeLog" 
-            SET "intakeTime" = %s, "isIntaked" = True, "status" = %s 
-            WHERE "pillcaseId" = %s AND "status" = %s AND %s = ANY("scheduleTime")
+            UPDATE "IntakeLog"
+            SET "intakeTime" = %s, "isIntaked" = True, "status" = %s
+            WHERE "status" = %s
+            AND %s >= ANY(ARRAY(SELECT EXTRACT(HOUR FROM unnest("scheduleTime"))::INTEGER))
             '''
-            cursor.execute(query, (intake_time, 'Completed', pillcase_id, 'Pending',intake_time))
+            cursor.execute(query, (current_hour, 'Completed', 'Pending', current_hour))
 
             conn.commit()
 
