@@ -1,11 +1,16 @@
 # The Shuffle Editor (https://shuffle.dev)
 
+NOTE: npm commands overwrite the ./public directory.
+
 ## 1. Getting Started
 
-The project's source files are placed in ./src/ directory. 
+Project's source files are placed in ./src/ directory. 
+* ./src/assets - default static files (eg. image placeholders). You should replace them with your own files.
+* ./src/tailwind/ - Tailwind config file used to build the theme. Variables used in Theme Customizer are located in tailwind.config.js file.
 
-* ./src/{framework}/ - settings used to build CSS.
-* ./src/pages/ - all your pages (templates) are stored in separate .js files.
+All your pages (templates) are stored in separated .pug or .html files (depends on your export preferences)
+* ./src/pug/*.pug 
+* ./src/html/*.html 
 
 ## 2. Installation
 
@@ -13,17 +18,17 @@ The project's source files are placed in ./src/ directory.
 # Install dependencies
 npm install 
 
-# Run dev server with live preview
-npm run start
+# Run dev server with live preview (Browsersync)
+npm run watch
 
-# Create an optimized production build
+# Or make a production build 
 npm run build
 ```
 
 ## 3. Contact
 
-If you have found any bugs in the Shuffle Editor, have any questions, 
-comments or ideas for new features, feel free to contact us:
+If you have found any bugs in the Tailwind Builder, have any questions, 
+comments or ideas for new features feel free to contact us:
 
 support@shuffle.dev
 
