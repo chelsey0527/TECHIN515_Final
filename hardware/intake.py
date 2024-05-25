@@ -36,7 +36,7 @@ def fetch_daily_intake_schedule():
     except Exception as error:
         print("Error fetching daily intake schedule:", error)
 
-def update_intake_log_in_database():
+def update_intake_log():
     current_time = datetime.now()
     current_hour = current_time.hour
 
