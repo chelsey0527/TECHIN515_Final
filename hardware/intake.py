@@ -1,5 +1,5 @@
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from dotenv import load_dotenv, find_dotenv
 from azure import connect_to_database
 
@@ -36,7 +36,7 @@ def fetch_daily_intake_schedule():
     except Exception as error:
         print("Error fetching daily intake schedule:", error)
 
-def update_intake_log():
+def update_intake_log_in_database():
     current_time = datetime.now()
     current_hour = current_time.hour
 
@@ -44,16 +44,40 @@ def update_intake_log():
         with connect_to_database() as conn:
             cursor = conn.cursor()
 
-            query = '''
+            # Find entries scheduled for the current hour
+            current_hour_query = '''
             UPDATE "IntakeLog"
-            SET "intakeTime" = %s, "isIntaked" = True, "status" = %s
-            WHERE "status" = %s
-            AND %s >= ANY(ARRAY(SELECT EXTRACT(HOUR FROM unnest("scheduleTime"))::INTEGER))
+            SET "intakeTime" = %s, "isIntaked" = True, "status" = 'Completed'
+            WHERE EXTRACT(HOUR FROM "scheduleTime") = %s
             '''
-            cursor.execute(query, (current_hour, 'Completed', 'Pending', current_hour))
+            cursor.execute(current_hour_query, (current_time, current_hour))
+
+            # Find the nearest previous group
+            previous_group_hour_query = '''
+            SELECT MAX(EXTRACT(HOUR FROM "scheduleTime")) FROM "IntakeLog"
+            WHERE EXTRACT(HOUR FROM "scheduleTime") < %s
+            '''
+            cursor.execute(previous_group_hour_query, (current_hour,))
+            previous_group_hour = cursor.fetchone()[0]
+
+            if previous_group_hour is not None:
+                previous_group_query = '''
+                UPDATE "IntakeLog"
+                SET "intakeTime" = %s, "isIntaked" = True, "status" = 'Late'
+                WHERE EXTRACT(HOUR FROM "scheduleTime") = %s
+                '''
+                cursor.execute(previous_group_query, (current_time, previous_group_hour))
+
+                # Mark older entries as "Missed"
+                older_entries_query = '''
+                UPDATE "IntakeLog"
+                SET "status" = 'Missed'
+                WHERE EXTRACT(HOUR FROM "scheduleTime") < %s
+                '''
+                cursor.execute(older_entries_query, (previous_group_hour,))
 
             conn.commit()
 
     except Exception as error:
-        print("Error updating intake log:", error)
+        print("Error updating intake log in database:", error)
         conn.rollback()
