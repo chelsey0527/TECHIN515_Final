@@ -58,7 +58,6 @@ export default function NavigationBar() {
         <Link
           to={`/`}
           className="logo-div flex space-x-3 items-center font-bold border-b-[1px] border-blue-50 pb-4 "
-          onClick={() => handleNavClick(0)}
         >
           <img className="w-10" src={logo} />
           <span

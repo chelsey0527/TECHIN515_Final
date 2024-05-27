@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import PillboxCard from "../components/PillboxCard";
-// import StorageEnvCard from "../components/StorageEnvCard";
-import HumidityChart from "../components/charts/HumidityChart";
-import TemperatureLineChart from "../components/charts/TemperatureLineChart";
+import StorageEnvCard from "../components/StorageEnvCard";
 
 // const BASE_URL = import.meta.env.VITE_BASE_URL;
 // const BASE_URL = "https://techin515.azurewebsites.net";
@@ -88,7 +86,7 @@ export default function Dashboard() {
       </div>
 
       {/* Pillbox */}
-      <h1 className="font-semibold font-heading container mx-auto pt-8 px-10 text-4xl">
+      <h1 className="font-bold font-heading container mx-auto pt-8 px-10 text-4xl">
         Pill Box
       </h1>
       <section className="">
@@ -102,27 +100,19 @@ export default function Dashboard() {
       </section>
 
       {/* Storage Environment */}
-      <h1 className="text-[#15181c] font-semibold font-heading container mx-auto px-10 pt-8 text-4xl">
+      <h1 className="font-bold font-heading container mx-auto px-10 pt-8 text-4xl">
         Storage Environment
       </h1>
-      <section>
+      <section className="py-3">
         <div className="container mx-auto">
           <div className="flex flex-wrap m-8">
-            <div className="w-full h-1/2 lg:w-1/2 px-4">
-              <HumidityChart
-                data={{
-                  pillboxHumidity: homeData.data?.pillboxHumidity ?? "NaN",
-                }}
-              />
-            </div>
-
-            <div className="w-full h-1/2 lg:w-1/2 px-4">
-              {/* <TemperatureLineChart
-                data={{
-                  pillboxTemperatue: homeData.data?.pillboxTemperature ?? "NaN",
-                }}
-              /> */}
-            </div>
+            <StorageEnvCard
+              props={{
+                ...homeData.data,
+                pillboxHumidity: homeData.data?.pillboxHumidity ?? "NaN",
+                pillboxTemperature: homeData.data?.pillboxTemperature ?? "NaN",
+              }}
+            />
           </div>
         </div>
       </section>

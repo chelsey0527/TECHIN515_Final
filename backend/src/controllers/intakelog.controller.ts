@@ -15,7 +15,6 @@ const calculateStatus = (
   if (isIntaked) {
     return "Completed";
   } else if (currentDateTime > itemDateTime) {
-    // TODO: when the following schedule happened
     return "Missed";
   } else {
     return "Pending";
