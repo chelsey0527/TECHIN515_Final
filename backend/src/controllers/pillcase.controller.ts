@@ -79,9 +79,63 @@ export const updatePillcaseById = async (
       where: { id: pillcaseId },
     });
 
+    if (!pillcaseToUpdate) {
+      res.status(404).json({ message: "Pill case not found" });
+      return;
+    }
+
     const updatedPillcase = await prisma.pillcase.update({
       where: { id: pillcaseId },
       data: newPillcaseData,
+    });
+
+    // Get today's date
+    const today = moment().tz("America/Los_Angeles").format("YYYY-MM-DD");
+
+    // Find today's logs for this pill case
+    const pillcaseLogs = await prisma.intakeLog.findMany({
+      where: {
+        pillcaseId: pillcaseId,
+        scheduleDate: today,
+      },
+    });
+
+    console.log(pillcaseLogs);
+
+    // Update today's logs that are pending and have different schedule times
+    const updates = pillcaseLogs
+      .map((log) => {
+        if (log.status === "Pending") {
+          // Find the corresponding index in the original schedule times
+          const index = pillcaseToUpdate.scheduleTimes.findIndex(
+            (time) => time === log.scheduleTime
+          );
+          if (
+            index !== -1 &&
+            newPillcaseData.scheduleTimes[index] !== log.scheduleTime
+          ) {
+            const newTime = newPillcaseData.scheduleTimes[index];
+            console.log("new time: ", newTime);
+            return prisma.intakeLog.update({
+              where: { id: log.id },
+              data: { scheduleTime: newTime },
+            });
+          }
+        }
+        return null;
+      })
+      .filter(Boolean);
+
+    console.log(updates);
+
+    // Execute all updates as a transaction
+    if (updates.length > 0) {
+      await prisma.$transaction(updates);
+    }
+
+    res.status(200).json({
+      message: "Pill case updated successfully",
+      data: updatedPillcase,
     });
   } catch (e) {
     console.error(e);

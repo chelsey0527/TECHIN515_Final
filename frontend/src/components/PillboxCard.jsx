@@ -28,7 +28,7 @@ export default function PillboxCard({ ...props }) {
             <img src={editIcon} alt="Edit" />
           </Link>
         </div>
-        <h2 className="mb-2 text-3xl font-bold mb-4">{pillName}</h2>
+        <h2 className="mb-2 text-3xl font-semibold mb-4">{pillName}</h2>
         <span className="text-gray-400 text-xs flex mb-1">
           {doses} {doses > 1 ? "Tablets" : "Tablet"}
         </span>

@@ -12,6 +12,7 @@ export default function PillboxEdit() {
   const [pillName, setPillName] = useState();
   const [doses, setDoses] = useState();
   const [scheduleTimes, setScheduledTimes] = useState([]);
+  const [isSaving, setIsSaving] = useState();
 
   useEffect(() => {
     const fetchPillCaseById = async () => {
@@ -35,14 +36,18 @@ export default function PillboxEdit() {
     };
 
     fetchPillCaseById();
-  }, []);
+  }, [boxId]);
 
   // Update data by Id
   const updatePillcaseById = async (event) => {
+    console.log("inside");
+    // print()
     event.preventDefault(); // Prevent the form from submitting the default way
     const filteredTimes = scheduleTimes.filter((time) => time !== ""); // Only send times that have been set
+    setIsSaving(true);
+
     try {
-      await fetch(`${BASE_URL}/pillcases/${boxId}`, {
+      const response = await fetch(`${BASE_URL}/pillcases/${boxId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -53,10 +58,21 @@ export default function PillboxEdit() {
           scheduleTimes: filteredTimes,
         }),
       });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Error response from server:", errorData);
+        throw new Error(`Error: ${errorData.message}`);
+      }
+
+      const responseData = await response.json();
+      console.log("Update response:", responseData);
+
       alert("Update successful!");
     } catch (e) {
       console.error("Failed to update pill case:", e);
-      alert("Update failed!");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -74,7 +90,7 @@ export default function PillboxEdit() {
     setDoses(event.target.value);
   };
 
-  console.log(pillName, boxNo, scheduleTimes);
+  console.log(boxNo, pillName, doses, scheduleTimes);
 
   return (
     <div className=" h-full w-full bg-sky-50 ">
@@ -84,13 +100,13 @@ export default function PillboxEdit() {
         </div>
       </div>
 
-      <p className="mb-2 mb-2 font-heading container px-10 mx-auto">
+      <p className="mb-2 font-heading container px-10 mx-auto">
         Please fill out the follwing form
       </p>
       <div className="container mx-auto mx-2">
         <div className="flex flex-wrap m-8">
           <div className="w-full bg-white px-6 py-8 mb-4">
-            <form onSubmit={updatePillcaseById} className="">
+            <form onSubmit={updatePillcaseById}>
               {/* Box number */}
               <div className="mb-6">
                 <label className="block text-sm font-medium">Box #</label>
@@ -132,7 +148,6 @@ export default function PillboxEdit() {
               />
 
               {/* Schedule Times */}
-              <span className="text-xs text-red-500"> *Required</span>
               {scheduleTimes.map((time, index) => (
                 <div key={index} className="mb-2">
                   <label
@@ -140,6 +155,9 @@ export default function PillboxEdit() {
                     className="flex text-sm font-medium text-gray-900 dark:text-white"
                   >
                     Select time {index + 1}:
+                    {index === 0 && (
+                      <span className="text-xs text-red-500"> *Required</span>
+                    )}
                   </label>
                   <div className="flex">
                     <input
@@ -160,8 +178,9 @@ export default function PillboxEdit() {
               <button
                 className="inline-block w-full md:w-auto mt-10 px-6 p-3 font-medium text-white bg-indigo-500 hover:bg-indigo-600 rounded transition duration-200"
                 type="submit"
+                disabled={isSaving}
               >
-                Save
+                {isSaving ? "Saving..." : "Save"}
               </button>
             </form>
           </div>
