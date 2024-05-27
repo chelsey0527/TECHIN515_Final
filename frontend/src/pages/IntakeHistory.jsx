@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import IntakeHistoryTable from "../components/IntakeHistoryTable";
+import Loading from "../components/Loading";
 
 // const BASE_URL = import.meta.env.VITE_BASE_URL;
 // const BASE_URL = "https://techin515.azurewebsites.net";
@@ -48,7 +49,7 @@ export default function IntakeHistory() {
   }, [fetchIntakeLogs, hasMore]);
 
   if (isLoading && page === 1) {
-    return <div className="h-screen w-full bg-sky-50">Loading...</div>;
+    return <Loading />;
   }
 
   return (

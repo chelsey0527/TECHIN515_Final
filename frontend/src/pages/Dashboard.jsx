@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import PillboxCard from "../components/PillboxCard";
 import StorageEnvCard from "../components/StorageEnvCard";
+import Loading from "../components/Loading";
 
 // const BASE_URL = import.meta.env.VITE_BASE_URL;
 // const BASE_URL = "https://techin515.azurewebsites.net";
@@ -72,7 +73,7 @@ export default function Dashboard() {
   }, []);
 
   if (isLoading) {
-    return <div className=" h-full w-full bg-sky-50 ">Loading...</div>;
+    return <Loading />;
   }
 
   return (
