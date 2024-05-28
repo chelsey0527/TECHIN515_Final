@@ -8,7 +8,7 @@ const Loading = () => {
       animations: {
         enabled: true,
         easing: "easeinout",
-        speed: 800,
+        speed: 2100,
         animateGradually: {
           enabled: true,
           delay: 150,
@@ -42,7 +42,7 @@ const Loading = () => {
   };
 
   // Dummy series value for loading animation
-  const series = [95];
+  const series = [100];
 
   return (
     <div className="h-full w-full bg-sky-50 flex items-center justify-center">

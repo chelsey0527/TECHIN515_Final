@@ -8,20 +8,18 @@ import Loading from "../components/Loading";
 const BASE_URL = "http://localhost:8080";
 
 export default function Dashboard() {
-  // console.log(import.meta.env);
-  // console.log(BASE_URL);
   const [isLoading, setIsLoading] = useState(false);
-  const [homeData, setHomeData] = useState({});
+  const [dashboardData, setDashboardData] = useState({});
 
   useEffect(() => {
-    const fetchHome = async () => {
+    const fetchData = async () => {
       setIsLoading(true);
       try {
         const response = await fetch(
-          `${BASE_URL}/home/ee430f72-7def-434c-ade8-c464c04655b7`
+          `${BASE_URL}/dashboard/ee430f72-7def-434c-ade8-c464c04655b7`
         );
         const data = await response.json();
-        setHomeData(data);
+        setDashboardData(data);
       } catch (e) {
         console.error(e);
       } finally {
@@ -29,15 +27,10 @@ export default function Dashboard() {
       }
     };
 
-    fetchHome();
+    fetchData();
   }, []);
 
-  useEffect(() => {
-    if (homeData.data) {
-      // Ensuring data is there before logging
-      // console.log("homeData has been updated:", homeData.data);
-    }
-  }, [homeData.data]); // Listening specifically to homeData.data
+  useEffect(() => {}, [dashboardData.data]);
 
   // WebSocket connection
   useEffect(() => {
@@ -49,7 +42,7 @@ export default function Dashboard() {
 
     ws.onmessage = (event) => {
       const message = JSON.parse(event.data);
-      setHomeData((prevData) => ({
+      setDashboardData((prevData) => ({
         ...prevData,
         data: {
           ...prevData.data,
@@ -59,13 +52,13 @@ export default function Dashboard() {
       }));
     };
 
-    ws.onerror = (error) => {
-      console.error("WebSocket Error:", error);
-    };
+    // ws.onerror = (error) => {
+    //   console.error("WebSocket Error:", error);
+    // };
 
-    ws.onclose = () => {
-      console.log("WebSocket Disconnected");
-    };
+    // ws.onclose = () => {
+    //   console.log("WebSocket Disconnected");
+    // };
 
     return () => {
       ws.close();
@@ -81,7 +74,7 @@ export default function Dashboard() {
       <div className="px-6 pb-4 pt-10">
         <div className="container px-4 mx-auto">
           <h2 className="text-2xl font-bold">
-            Welcome, {homeData.data?.name} 👋
+            Welcome, {dashboardData.data?.name} 👋
           </h2>
         </div>
       </div>
@@ -93,7 +86,7 @@ export default function Dashboard() {
       <section className="">
         <div className="container mx-auto">
           <div className="flex flex-wrap m-8">
-            {homeData.data?.pillcases?.map((item, index) => (
+            {dashboardData.data?.pillcases?.map((item, index) => (
               <PillboxCard key={index} props={item} />
             ))}
           </div>
@@ -109,9 +102,10 @@ export default function Dashboard() {
           <div className="flex flex-wrap m-8">
             <StorageEnvCard
               props={{
-                ...homeData.data,
-                pillboxHumidity: homeData.data?.pillboxHumidity ?? "NaN",
-                pillboxTemperature: homeData.data?.pillboxTemperature ?? "NaN",
+                ...dashboardData.data,
+                pillboxHumidity: dashboardData.data?.pillboxHumidity ?? "NaN",
+                pillboxTemperature:
+                  dashboardData.data?.pillboxTemperature ?? "NaN",
               }}
             />
           </div>

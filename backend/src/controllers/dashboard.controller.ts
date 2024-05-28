@@ -3,8 +3,8 @@ import { Request, Response } from "express";
 
 const prisma = new PrismaClient();
 
-// getHomeData: Fetches all relevant data for home page
-export const getHomeData = async (
+// getDashboardData: Fetches all relevant data for Dashboard page
+export const getDashboardData = async (
   req: Request,
   res: Response
 ): Promise<void> => {
@@ -42,6 +42,6 @@ export const getHomeData = async (
     }
   } catch (e) {
     console.error(e);
-    res.status(500).json({ message: "Error fetching home data" });
+    res.status(500).json({ message: "Error fetching Dashboard data" });
   }
 };

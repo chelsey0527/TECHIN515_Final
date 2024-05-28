@@ -4,7 +4,7 @@ import temperatureIcon from "../assets/temperatureIcon.svg";
 export default function storageCard({ ...props }) {
   const humidity = props.props.pillboxHumidity;
   const temperature = props.props.pillboxTemperature;
-  console.log(props);
+  // console.log(props);
 
   return (
     <div className="container px-4 mx-auto">

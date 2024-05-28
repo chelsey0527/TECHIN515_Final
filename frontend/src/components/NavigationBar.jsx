@@ -1,6 +1,13 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Gauge, Clock3, ArrowRight, Settings } from "lucide-react";
+import {
+  Gauge,
+  Clock3,
+  ArrowRight,
+  Settings,
+  Calendar,
+  BarChart3,
+} from "lucide-react";
 import { motion } from "framer-motion";
 import logo from "/logo.svg";
 
@@ -11,9 +18,19 @@ const navLinks = [
     path: "/dashboard",
   },
   {
+    name: "Upcoming schedules",
+    icon: Calendar,
+    path: "/upcoming-schedules",
+  },
+  {
     name: "Intake History",
     icon: Clock3,
     path: "/intake-history",
+  },
+  {
+    name: "Analyzation",
+    icon: BarChart3,
+    path: "/data-analyzation",
   },
   // {
   //   name: "Settings",

@@ -4,11 +4,12 @@ import cron from "node-cron";
 import cors from "cors";
 
 import userRouter from "./routes/user.router";
-import homeRouter from "./routes/home.router";
+import dashboardRouter from "./routes/dashboard.router";
 import pillcaseRouter from "./routes/pillcase.router";
 import locationRouter from "./routes/environment.router";
 import intakelogRouter from "./routes/intakelog.router";
 import deviceRouter from "./routes/device.router";
+import upcomingRouter from "./routes/upcoming.router";
 import { scheduleDailyIntakeLogs } from "./controllers/intakelog.controller";
 import { WebSocketService } from "./services/websocket.service";
 
@@ -22,8 +23,9 @@ app.get("/", (req, res) => {
   res.status(200).send("Backend API is running!");
 });
 app.use("/users", userRouter);
-app.use("/home", homeRouter);
+app.use("/dashboard", dashboardRouter);
 app.use("/pillcases", pillcaseRouter);
+app.use("/upcoming", upcomingRouter);
 app.use("/intakelog", intakelogRouter);
 app.use("/location", locationRouter);
 app.use("/device", deviceRouter);
