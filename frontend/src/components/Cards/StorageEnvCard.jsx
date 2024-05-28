@@ -1,5 +1,5 @@
-import humidityIcon from "../assets/humidityIcon.svg";
-import temperatureIcon from "../assets/temperatureIcon.svg";
+import humidityIcon from "../../assets/humidityIcon.svg";
+import temperatureIcon from "../../assets/temperatureIcon.svg";
 
 export default function storageCard({ ...props }) {
   const humidity = props.props.pillboxHumidity;

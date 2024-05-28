@@ -7,6 +7,7 @@ import {
   Settings,
   Calendar,
   BarChart3,
+  History,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import logo from "/logo.svg";
@@ -22,15 +23,15 @@ const navLinks = [
     icon: Calendar,
     path: "/upcoming-schedules",
   },
+  // {
+  //   name: "Analyzation",
+  //   icon: BarChart3,
+  //   path: "/data-analyzation",
+  // },
   {
     name: "Intake History",
-    icon: Clock3,
+    icon: History,
     path: "/intake-history",
-  },
-  {
-    name: "Analyzation",
-    icon: BarChart3,
-    path: "/data-analyzation",
   },
   // {
   //   name: "Settings",

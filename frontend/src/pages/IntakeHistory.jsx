@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import IntakeHistoryTable from "../components/IntakeHistoryTable";
+import IntakeHistoryTable from "../components/Tables/IntakeHistoryTable";
 import Loading from "../components/Loading";
 
 // const BASE_URL = import.meta.env.VITE_BASE_URL;
@@ -7,14 +7,19 @@ import Loading from "../components/Loading";
 const BASE_URL = "http://localhost:8080";
 
 export default function IntakeHistory() {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingInitial, setIsLoadingInitial] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [intakeHistoryData, setIntakeHistoryData] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const limit = 10;
 
-  const fetchIntakeLogs = useCallback(async (page) => {
-    setIsLoading(true);
+  const fetchIntakeLogs = useCallback(async (page, isInitial = false) => {
+    if (isInitial) {
+      setIsLoadingInitial(true);
+    } else {
+      setIsLoadingMore(true);
+    }
     try {
       const response = await fetch(
         `${BASE_URL}/intakelog/ee430f72-7def-434c-ade8-c464c04655b7?page=${page}&limit=${limit}`
@@ -25,7 +30,11 @@ export default function IntakeHistory() {
       console.error(e);
       return [];
     } finally {
-      setIsLoading(false);
+      if (isInitial) {
+        setIsLoadingInitial(false);
+      } else {
+        setIsLoadingMore(false);
+      }
     }
   }, []);
 
@@ -48,7 +57,7 @@ export default function IntakeHistory() {
     fetchInitialData();
   }, [fetchIntakeLogs, hasMore]);
 
-  if (isLoading && page === 1) {
+  if (isLoadingInitial && page === 1) {
     return <Loading />;
   }
 
@@ -74,9 +83,13 @@ export default function IntakeHistory() {
                 <button
                   className="inline-flex items-center text-xs text-indigo-500 hover:text-blue-600 font-medium"
                   onClick={loadMoreRecords}
-                  disabled={isLoading || !hasMore}
+                  disabled={isLoadingMore || !hasMore}
                 >
-                  <span>Load more records</span>
+                  {isLoadingMore ? (
+                    <span>Loading...</span>
+                  ) : (
+                    <span>Load more records</span>
+                  )}
                 </button>
                 {!hasMore && (
                   <div className="text-center mt-5 text-gray-500 text-xs">

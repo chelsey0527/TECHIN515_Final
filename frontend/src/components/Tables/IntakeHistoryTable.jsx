@@ -1,4 +1,4 @@
-import { convertTo12HourFormat } from "../utils/timeUtils";
+import { convertTo12HourFormat } from "../../utils/timeUtils";
 
 export default function IntakeHistoryTable({ data }) {
   const headers = [
@@ -11,7 +11,7 @@ export default function IntakeHistoryTable({ data }) {
   ];
   // console.log("inside table", data);
 
-  console.log(data);
+  // console.log(data);
 
   return (
     <table className="table-auto w-full">

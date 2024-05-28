@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import PillboxCard from "../components/PillboxCard";
-import StorageEnvCard from "../components/StorageEnvCard";
+import PillboxCard from "../components/Cards/PillboxCard";
+import StorageEnvCard from "../components/Cards/StorageEnvCard";
 import Loading from "../components/Loading";
 
 // const BASE_URL = import.meta.env.VITE_BASE_URL;
