@@ -10,29 +10,60 @@ export default function UpcomingSchedules() {
   const [isLoading, setIsLoading] = useState(false);
   const [nextSchedulesData, setNextSchedulesData] = useState({});
 
-  useEffect(() => {
-    const nextSchedule = async () => {
-      setIsLoading(true);
-      try {
-        const response = await fetch(
-          `${BASE_URL}/upcoming/ee430f72-7def-434c-ade8-c464c04655b7`
-        );
-        const data = await response.json();
-        setNextSchedulesData(data);
-        console.log("next:", data);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const nextSchedule = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `${BASE_URL}/upcoming/ee430f72-7def-434c-ade8-c464c04655b7`
+      );
+      const data = await response.json();
+      setNextSchedulesData(data);
+      // console.log("next:", data);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
     nextSchedule();
   }, []);
 
   useEffect(() => {
-    console.log(nextSchedulesData);
+    // console.log(nextSchedulesData);
   }, [nextSchedulesData.data]); // Listening specifically to homeData.data
+
+  const markAsDone = async (id) => {
+    try {
+      const response = await fetch(`${BASE_URL}/upcoming/${id}/done`, {
+        method: "PATCH",
+      });
+      const data = await response.json();
+      // console.log("Updated intake log:", data);
+      nextSchedule();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const markAllAsDone = async () => {
+    const ids = nextSchedulesData.data.map((schedule) => schedule.id);
+    try {
+      const response = await fetch(`${BASE_URL}/upcoming/done`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ids }),
+      });
+      const data = await response.json();
+      // console.log("All intake logs updated:", data);
+      nextSchedule();
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   if (isLoading) {
     return <Loading />;
@@ -67,13 +98,14 @@ export default function UpcomingSchedules() {
                   <div className="flex-1 shrink-0 sm:flex sm:flex-col sm:items-end">
                     <p className="text-sm leading-6 text-gray-900">
                       Next schedule:{" "}
-                      {convertTo12HourFormat(schedule.nextSchedule)}
+                      {convertTo12HourFormat(schedule.scheduleTime)}
                     </p>
                   </div>
                   <div className="flex-1 shrink-0 sm:flex sm:flex-col sm:items-end">
                     <button
                       className="inline-block w-full md:w-auto px-6 p-3 text-sm text-white bg-indigo-500 hover:bg-indigo-600 rounded transition duration-200"
-                      type="submit"
+                      onClick={() => markAsDone(schedule.id)}
+                      type="button"
                     >
                       Done
                     </button>
@@ -84,7 +116,7 @@ export default function UpcomingSchedules() {
             <div className="flex justify-end py-4 px-10">
               <button
                 className="inline-block px-6 py-3 text-sm text-white bg-indigo-500 hover:bg-indigo-600 rounded transition duration-200"
-                onClick={() => console.log("All Done button clicked")}
+                onClick={markAllAsDone}
               >
                 All Done 🎉
               </button>
