@@ -101,7 +101,7 @@ export default function UpcomingSchedules() {
                   </div>
                   <div className="flex-1 shrink-0 sm:flex sm:flex-col sm:items-end">
                     <p className="text-sm leading-6 text-gray-900">
-                      Next schedule:{" "}
+                      <span className="font-bold">Scheduled Time: </span>{" "}
                       {convertTo12HourFormat(schedule.scheduleTime)}
                     </p>
                   </div>

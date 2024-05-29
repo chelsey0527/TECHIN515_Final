@@ -160,15 +160,15 @@ const DataAnalyzation = ({ userId }) => {
               </div>
             </div>
           </div>
-        </div>
-        <div className="w-full  p-4">
-          <div className="p-6 bg-white shadow rounded-lg">
-            <Chart
-              options={missedPillsBarChartOptions}
-              series={missedPillsBarChartSeries}
-              type="bar"
-              height={350}
-            />
+          <div className="w-full pt-4">
+            <div className="p-6 bg-white shadow rounded-lg">
+              <Chart
+                options={missedPillsBarChartOptions}
+                series={missedPillsBarChartSeries}
+                type="bar"
+                height={350}
+              />
+            </div>
           </div>
         </div>
       </section>
