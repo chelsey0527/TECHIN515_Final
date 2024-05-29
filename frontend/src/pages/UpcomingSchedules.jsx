@@ -48,6 +48,10 @@ export default function UpcomingSchedules() {
   };
 
   const markAllAsDone = async () => {
+    if (nextSchedulesData.message === "No upcoming schedules found") {
+      window.alert("You already finish all schedules!");
+      return;
+    }
     const ids = nextSchedulesData.data.map((schedule) => schedule.id);
     try {
       const response = await fetch(`${BASE_URL}/upcoming/done`, {
@@ -112,6 +116,7 @@ export default function UpcomingSchedules() {
                   </div>
                 </li>
               ))}
+              {nextSchedulesData.message && `No more schdules for today!`}
             </ul>
             <div className="flex justify-end py-4 px-10">
               <button

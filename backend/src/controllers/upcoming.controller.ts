@@ -50,6 +50,7 @@ export const getNextSchedules = async (
     // Find the earliest next schedule time
     if (nextIntakeLogs.length === 0) {
       res.status(200).json({ message: "No upcoming schedules found" });
+      return;
     }
 
     const earliestNextScheduleDate = nextIntakeLogs[0].scheduleDate;
