@@ -50,12 +50,15 @@ export default function IntakeHistory() {
 
   useEffect(() => {
     const fetchInitialData = async () => {
-      const initialData = await fetchIntakeLogs(1);
+      const initialData = await fetchIntakeLogs(1, true);
       setIntakeHistoryData(initialData);
+      if (initialData.length < limit) {
+        setHasMore(false);
+      }
     };
 
     fetchInitialData();
-  }, [fetchIntakeLogs, hasMore]);
+  }, [fetchIntakeLogs]);
 
   if (isLoadingInitial && page === 1) {
     return <Loading />;
