@@ -10,34 +10,39 @@ import {
   History,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import logo from "/logo.svg";
+import logo from "/logo.png";
 
 const navLinks = [
   {
-    name: "Dashboard",
-    icon: Gauge,
-    path: "/dashboard",
+    category: "Main",
+    links: [
+      {
+        name: "Dashboard",
+        icon: Gauge,
+        path: "/dashboard",
+      },
+      {
+        name: "Upcoming schedules",
+        icon: Calendar,
+        path: "/upcoming-schedules",
+      },
+    ],
   },
   {
-    name: "Upcoming schedules",
-    icon: Calendar,
-    path: "/upcoming-schedules",
+    category: "History",
+    links: [
+      {
+        name: "Analyzation",
+        icon: BarChart3,
+        path: "/data-analyzation",
+      },
+      {
+        name: "Intake History",
+        icon: History,
+        path: "/intake-history",
+      },
+    ],
   },
-  // {
-  //   name: "Analyzation",
-  //   icon: BarChart3,
-  //   path: "/data-analyzation",
-  // },
-  {
-    name: "Intake History",
-    icon: History,
-    path: "/intake-history",
-  },
-  // {
-  //   name: "Settings",
-  //   icon: Settings,
-  //   path: "/settings",
-  // },
 ];
 
 const variants = {
@@ -46,20 +51,20 @@ const variants = {
 };
 
 export default function NavigationBar() {
-  const [activeNavIndex, setActiveNavIndex] = useState(0);
+  const [activeNavIndex, setActiveNavIndex] = useState("0-0");
   const [isExpanded, setIsExpanded] = useState(true);
 
   useEffect(() => {
     // Retrieve the active navigation index from localStorage
     const savedIndex = localStorage.getItem("activeNavIndex");
     if (savedIndex !== null) {
-      setActiveNavIndex(parseInt(savedIndex, 10));
+      setActiveNavIndex(savedIndex);
     }
   }, []);
 
-  const handleNavClick = (index) => {
+  const handleNavClick = (categoryIndex, linkIndex) => {
+    const index = `${categoryIndex}-${linkIndex}`;
     setActiveNavIndex(index);
-    // Save the active navigation index to localStorage
     localStorage.setItem("activeNavIndex", index);
   };
 
@@ -69,20 +74,20 @@ export default function NavigationBar() {
         animate={isExpanded ? "expanded" : "nonExpanded"}
         variants={variants}
         className={
-          " py-12 flex flex-col  w-1/5 h-full relative  lg:border-b" +
+          " py-12 flex flex-col  w-1/5 h-full relative " +
           (isExpanded ? " px-5 " : " px-2 ")
         }
       >
         <Link
           to={`/`}
           className="logo-div flex space-x-3 items-center font-bold border-b-[1px] border-blue-50 pb-4 "
-          onClick={() => handleNavClick(0)}
+          onClick={() => handleNavClick(0, 0)}
         >
           <img className="w-10" src={logo} />
           <span
             className={" text-[#382CDD] " + (isExpanded ? "block" : "hidden")}
           >
-            Medibox
+            MediBot
           </span>
         </Link>
 
@@ -93,24 +98,36 @@ export default function NavigationBar() {
           <ArrowRight className="w-4 text-white" />
         </div>
 
-        <div className="mt-9 flex-col">
-          {navLinks.map((item, index) => (
-            <Link
-              to={item.path}
-              key={index}
-              className={
-                " flex space-x-3 p-2 rounded text-sm " +
-                (activeNavIndex === index
-                  ? " bg-[#382CDD] text-white "
-                  : " text-gray-500 hover:bg-indigo-50 ")
-              }
-              onClick={() => handleNavClick(index)}
-            >
-              <item.icon />
-              <span className={isExpanded ? "block" : "hidden"}>
-                {item.name}
-              </span>
-            </Link>
+        <div className="flex-col">
+          {navLinks.map((category, categoryIndex) => (
+            <div key={categoryIndex}>
+              <h3 className="text-xs font-bold mt-5 text-gray-400 uppercase">
+                {category.category}
+              </h3>
+              <div className="mt-3 space-y-2">
+                {category.links.map((item, linkIndex) => {
+                  const index = `${categoryIndex}-${linkIndex}`;
+                  return (
+                    <Link
+                      to={item.path}
+                      key={index}
+                      className={
+                        "flex space-x-3 p-2 rounded text-sm " +
+                        (activeNavIndex === index
+                          ? " bg-[#382CDD] text-white "
+                          : " text-gray-500 hover:bg-indigo-50 ")
+                      }
+                      onClick={() => handleNavClick(categoryIndex, linkIndex)}
+                    >
+                      <item.icon />
+                      <span className={isExpanded ? "block" : "hidden"}>
+                        {item.name}
+                      </span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
           ))}
         </div>
       </motion.div>

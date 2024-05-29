@@ -118,7 +118,7 @@ export default function UpcomingSchedules() {
               ))}
               {nextSchedulesData.message && `No more schdules for today!`}
             </ul>
-            <div className="flex justify-end py-4 px-10">
+            <div className="flex justify-end py-4 px-10 border-t-[3px] border-blue-50 ">
               <button
                 className="inline-block px-6 py-3 text-sm text-white bg-indigo-500 hover:bg-indigo-600 rounded transition duration-200"
                 onClick={markAllAsDone}
