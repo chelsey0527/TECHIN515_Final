@@ -22,7 +22,7 @@ const navLinks = [
         path: "/dashboard",
       },
       {
-        name: "Upcoming schedules",
+        name: "Upcoming Schedules",
         icon: Calendar,
         path: "/upcoming-schedules",
       },
