@@ -27,14 +27,8 @@ port = os.getenv("PORT")
 listening = True
 engine = pyttsx3.init()
 
-# Define the GPIO pin numbers
-BUTTON_GPIO_PIN = 23  # GPIO pin for the intake completion button
-
 # # Initialize the GPIO
 h = lgpio.gpiochip_open(4)
-
-# # Set up GPIO pin as input for the button
-lgpio.gpio_claim_input(h, BUTTON_GPIO_PIN)
 
 # Fetch daily intake schedule and store it
 daily_schedule = fetch_daily_intake_schedule()
@@ -44,7 +38,7 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 
 def classify_intent(user_input):
     intent_messages = [
-        {"role": "system", "content": "You are Tom, an assistant that classifies the intent of user queries about a medication schedule. The categories are: 'last_intake', 'next_intake', 'list_all', or 'unknown'."},
+        {"role": "system", "content": "You are MediBot, an assistant that classifies the intent of user queries about a medication schedule. The categories are: 'last_intake', 'next_intake', 'list_all', or 'unknown'."},
         {"role": "user", "content": user_input}
     ]
 
@@ -136,7 +130,7 @@ while listening:
         update_humidity_temperature()
         # Check and remind for pill intake periodically (every minute)
         remind_to_take_pills(daily_schedule)
-        
+
         with sr.Microphone() as source:
             recognizer = sr.Recognizer()
             recognizer.adjust_for_ambient_noise(source)
@@ -147,18 +141,23 @@ while listening:
             response = recognizer.recognize_google(audio)
             print(response)
 
-            if "tom" in response.lower():
+            if "hey medibot" in response.lower():
                 intent = classify_intent(response)
                 response_from_intent = generate_response(intent, daily_schedule)
                 engine.setProperty('rate', 155)
                 engine.setProperty('volume', volume)
                 engine.setProperty('voice', 'english')
+                engine.say("Hi! I'm listening.")
                 engine.say(response_from_intent)
                 engine.runAndWait()
 
-            elif "okay" in response.lower():
+            elif "okay medibot" in response.lower():
                 update_intake_log()
+                engine.setProperty('rate', 155)
+                engine.setProperty('volume', volume)
+                engine.setProperty('voice', 'english')
                 engine.say("Well done!")
+                engine.runAndWait()
                 # Refresh the daily schedule after updating the log
                 daily_schedule = fetch_daily_intake_schedule()
 
