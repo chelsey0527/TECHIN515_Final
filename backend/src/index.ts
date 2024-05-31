@@ -39,7 +39,7 @@ const server = http.createServer(app);
 const webSocketService = new WebSocketService(server);
 
 server.listen(port, () => {
-  console.log(`server running on ${port} !`);
+  console.log(`Server running on ${port} !`);
 });
 
 // Setting up the cron job to run at midnight every day
