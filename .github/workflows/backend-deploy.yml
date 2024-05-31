@@ -20,6 +20,14 @@ jobs:
         with:
           node-version: "18.x"
 
+      - name: Cache Node modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}-ci:false
+          restore-keys: |
+            ${{ runner.os }}-node-
+
       - name: npm install, build, and test
         run: |
           cd backend
