@@ -38,7 +38,7 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 
 def classify_intent(user_input):
     intent_messages = [
-        {"role": "system", "content": "You are MediBot, an assistant that classifies the intent of user queries about a medication schedule. The categories are: 'last_intake', 'next_intake', 'list_all', or 'unknown'."},
+        {"role": "system", "content": "You are Maddie, an assistant that classifies the intent of user queries about a medication schedule. The categories are: 'last_intake', 'next_intake', 'list_all', or 'unknown'."},
         {"role": "user", "content": user_input}
     ]
 
@@ -56,11 +56,11 @@ volume = engine.getProperty('volume')
 
 # Function to get response from OpenAI ChatGPT
 def generate_response(intent, daily_schedule):
-    if intent == 'last_intake':
+    if intent == 'intent: last_intake':
         return get_last_intake(daily_schedule)
-    elif intent == 'next_intake':
+    elif intent == 'intent: next_intake':
         return get_next_intake(daily_schedule)
-    elif intent == 'list_all':
+    elif intent == 'intent: list_all':
         return list_upcoming_intakes(daily_schedule)
     else:
         return "I'm sorry, I didn't understand that. Can you please rephrase?"
@@ -120,6 +120,9 @@ def remind_to_take_pills(schedule):
         if current_time in schedule_time:
             reminder_message = f"Please take {doses} dose(s) from pillbox {case_no}"
             print(reminder_message)
+            engine.setProperty('rate', 155)
+            engine.setProperty('volume', volume)
+            engine.setProperty('voice', 'english')
             engine.say(reminder_message)
             engine.runAndWait()
 
@@ -128,6 +131,8 @@ while listening:
     try:
         # Update humidity and temperature
         update_humidity_temperature()
+        # Check for new schedule
+        daily_schedule = fetch_daily_intake_schedule()
         # Check and remind for pill intake periodically (every minute)
         remind_to_take_pills(daily_schedule)
 
@@ -141,17 +146,17 @@ while listening:
             response = recognizer.recognize_google(audio)
             print(response)
 
-            if "hey medibot" in response.lower():
+            if "hey maddie" in response.lower():
                 intent = classify_intent(response)
                 response_from_intent = generate_response(intent, daily_schedule)
                 engine.setProperty('rate', 155)
                 engine.setProperty('volume', volume)
                 engine.setProperty('voice', 'english')
-                engine.say("Hi! I'm listening.")
+                engine.say("Hi!")
                 engine.say(response_from_intent)
                 engine.runAndWait()
 
-            elif "okay medibot" in response.lower():
+            elif "okay maddie" in response.lower():
                 update_intake_log()
                 engine.setProperty('rate', 155)
                 engine.setProperty('volume', volume)
@@ -160,8 +165,6 @@ while listening:
                 engine.runAndWait()
                 # Refresh the daily schedule after updating the log
                 daily_schedule = fetch_daily_intake_schedule()
-
-        time.sleep(60)
 
     except sr.WaitTimeoutError:
         print("No command detected.")
