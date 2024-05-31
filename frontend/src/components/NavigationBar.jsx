@@ -32,7 +32,7 @@ const navLinks = [
     category: "History",
     links: [
       {
-        name: "Analyzation",
+        name: "Intake Insights",
         icon: BarChart3,
         path: "/data-analyzation",
       },

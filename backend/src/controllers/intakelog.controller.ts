@@ -64,12 +64,12 @@ export const getIntakelogData = async (
     );
 
     // Then, sort by caseNo in ascending order where scheduleDate is the same
-    intakeLogs.sort((a, b) => {
-      if (a.scheduleDate === b.scheduleDate) {
-        return a.caseNo - b.caseNo; // Ensure caseNo is a number
-      }
-      return 0;
-    });
+    // intakeLogs.sort((a, b) => {
+    //   if (a.scheduleDate === b.scheduleDate) {
+    //     return a.caseNo - b.caseNo; // Ensure caseNo is a number
+    //   }
+    //   return 0;
+    // });
 
     // Calculate and update the status in the database
     const updates = intakeLogs.map((log) => {
