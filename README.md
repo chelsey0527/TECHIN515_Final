@@ -1,4 +1,4 @@
-# Medibox
+# Medibox (Smart pillbox)
 
 ## 🙋 Problem
 

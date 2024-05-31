@@ -30,7 +30,7 @@ app.use("/upcoming", upcomingRouter);
 app.use("/analyzation", analyzationRouter);
 app.use("/intakelog", intakelogRouter);
 app.use("/location", locationRouter);
-app.use("/device", deviceRouter);
+// app.use("/device", deviceRouter);
 
 // Create a server from the express app
 const server = http.createServer(app);
