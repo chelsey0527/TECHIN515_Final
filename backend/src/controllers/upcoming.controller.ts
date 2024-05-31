@@ -123,3 +123,35 @@ export const markAllIntakeLogsAsDone = async (
     res.status(500).json({ message: "Error updating intake logs" });
   }
 };
+
+// Update Upcoming Schedules' Scheduled Time
+export const updateUpcomingSchedulesTime = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { ids } = req.body;
+    const newScheduleTime = moment()
+      .tz("America/Los_Angeles")
+      .add(2, "minutes")
+      .format("HH:mm");
+
+    const updates = ids.map((id: string) =>
+      prisma.intakeLog.update({
+        where: { id: id },
+        data: {
+          scheduleTime: newScheduleTime,
+        },
+      })
+    );
+
+    await prisma.$transaction(updates);
+
+    res
+      .status(200)
+      .json({ message: "Upcoming schedules updated successfully" });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ message: "Error updating upcoming schedules" });
+  }
+};

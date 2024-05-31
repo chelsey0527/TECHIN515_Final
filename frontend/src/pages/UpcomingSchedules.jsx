@@ -69,6 +69,23 @@ export default function UpcomingSchedules() {
     }
   };
 
+  const updateScheduleTime = async () => {
+    const ids = nextSchedulesData.data.map((schedule) => schedule.id);
+    try {
+      const response = await fetch(`${BASE_URL}/upcoming/update-time`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ids }),
+      });
+      const data = await response.json();
+      nextSchedule();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   if (isLoading) {
     return <Loading />;
   }
@@ -124,6 +141,12 @@ export default function UpcomingSchedules() {
                 onClick={markAllAsDone}
               >
                 All Done 🎉
+              </button>
+              <button
+                className="inline-block px-6 py-3 ml-4 text-sm text-indigo-600 border-b-indigo-500 hover:bg-indigo-100 rounded transition duration-200"
+                onClick={updateScheduleTime}
+              >
+                Update Schedule Time ⏱️
               </button>
             </div>
           </div>
